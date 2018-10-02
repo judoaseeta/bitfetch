@@ -1,0 +1,19 @@
+{
+  "name": "bitfetch",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/judoaseeta/bitfetch.git"
+  },
+  "author": "Roy Choi <judoaseeta@gmail.com> (https://github.com/judoaseeta)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/judoaseeta/bitfetch/issues"
+  },
+  "homepage": "https://github.com/judoaseeta/bitfetch#readme"
+}
