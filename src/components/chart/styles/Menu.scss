@@ -1,4 +1,4 @@
-@import 'utils';
+@import '../../../utils/utils';
 .menu {
   @extend %flexRowAligned;
   &.off {
