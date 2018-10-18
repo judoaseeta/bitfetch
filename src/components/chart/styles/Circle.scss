@@ -1,0 +1,21 @@
+.circle {
+  fill: red;
+  stroke: black;
+  stroke-width: 1px;
+  cursor: pointer;
+  &.selected {
+    animation: Selected 0.5s infinite;
+    fill: blue;
+  }
+}
+
+@keyframes Selected {
+  from {
+     fill: blue;
+
+  }
+  to {
+    fill: red;
+  }
+}
+

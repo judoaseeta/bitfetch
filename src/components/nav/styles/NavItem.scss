@@ -1,0 +1,13 @@
+.item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1em;
+  > a {
+    text-decoration: none;
+    color: #f6e58d;
+    &:visited {
+      color: #f6e58d;
+    }
+  }
+}

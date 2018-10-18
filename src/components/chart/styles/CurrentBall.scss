@@ -1,0 +1,10 @@
+.ball {
+  fill: blue;
+  stroke: white;
+  stroke-width: 1px;
+  cursor: pointer;
+  &:hover {
+    stroke: snow;
+    stroke-width: 2px;
+  }
+}

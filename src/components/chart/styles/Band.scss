@@ -1,0 +1,10 @@
+.band {
+  fill: #cd6133;
+  stroke: #cd6133;
+  stroke-width: 0.1px;
+  shape-rendering: crispEdges;
+  opacity: 0;
+  &.selected{
+    opacity: 1;
+  }
+}

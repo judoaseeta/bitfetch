@@ -1,0 +1,12 @@
+@import "CandleChart";
+.candleBar {
+  @include candleStickShape();
+  &.selected {
+    stroke: white;
+    stroke-width: 1px;
+  }
+  &.unvisible {
+    fill: transparent;
+    stroke: none;
+  }
+}

@@ -1,0 +1,10 @@
+@import 'CandleChart';
+
+.stick {
+  @include candleStickShape();
+  stroke-width: 0.1px;
+  &.selected {
+    stroke: white;
+    stroke-width: 1px;
+  }
+}

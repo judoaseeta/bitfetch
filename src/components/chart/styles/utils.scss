@@ -1,0 +1,9 @@
+%flexRowAligned {
+   display: flex;
+   justify-content: center;
+   align-items: center;
+ }
+%flexColumnAligned {
+  @extend %flexRowAligned;
+  flex-direction: column;
+}

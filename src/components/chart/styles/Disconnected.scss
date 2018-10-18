@@ -1,0 +1,4 @@
+@import 'utils';
+.container {
+  @extend %flexColumnAligned;
+}

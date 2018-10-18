@@ -1,0 +1,9 @@
+@import 'utils';
+.menu {
+  @extend %flexRowAligned;
+  &.off {
+    transform: translateX(80%);
+    transition: transform 0.5s ease-in;
+
+  }
+}

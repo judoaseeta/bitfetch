@@ -1,0 +1,21 @@
+.path {
+
+  &.loadingPath {
+    stroke: #c8d6e5;
+    stroke-width: 5px;
+    fill: transparent;
+    stroke-dasharray: 1320;
+    stroke-dashoffset: 1320px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    animation: dash 3s linear infinite;
+  }
+}
+@keyframes dash {
+  90% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    fill: #0652DD;
+  }
+}

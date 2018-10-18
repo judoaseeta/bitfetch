@@ -1,0 +1,34 @@
+.container {
+  display: flex;
+  background-color: #487eb0;
+  > nav {
+    display: flex;
+    > ul {
+      display: flex;
+      flex-direction: row;
+      -webkit-padding-start: 0;
+      -webkit-margin-before: 0;
+      -webkit-margin-after: 0;
+      list-style: none;
+    }
+  }
+  & .search {
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+  }
+  & .test {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    background-color: transparent;
+    &.on {
+      width: 100%;
+      height: 100%;
+    }
+  }
+}
