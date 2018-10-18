@@ -35,10 +35,8 @@ module.exports = [
         module: {
             rules: [
                 {
-                    test: /\.(ts| tsx)$/,
-                    use:{
-                        loader: "ts-loader"
-                    },
+                    test: /\.(ts|tsx)$/,
+                    loader: "ts-loader",
                     exclude: /node_modules/,
                 },
                 {
@@ -85,7 +83,7 @@ module.exports = [
             ]
         },
         resolve: {
-            extensions: ['.js', '.jsx','.ts', '.tsx'],
+            extensions: ['.ts', '.tsx', '.js', '.jsx'],
         },
         target: 'node',
         externals: [nodeExternals()],
