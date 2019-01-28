@@ -9,7 +9,9 @@ import Band from './Band';
 import Candle from './Candle';
 import Circle from './Circle';
 import Current from './Current';
+import Disconnected from './Disconnected';
 import Gradient from './Gradient';
+import HistoType from './HistoType';
 // import Indicator from './Indicator';
 import Indicators from './Indicators';
 import Loading from './Loading';
@@ -35,6 +37,7 @@ const CandleChart = React.forwardRef<HTMLDivElement, RenderProps>(({
                                           fsym,
                                           height,
                                           loading,
+                                          listenCurrent,
                                           line,
                                           isDisconnected,
                                           marginRight,
@@ -58,11 +61,10 @@ const CandleChart = React.forwardRef<HTMLDivElement, RenderProps>(({
             className={styles.container}
             ref={ref}
         >
-            <Portal
+            <Disconnected
                 isActive={isDisconnected}
-            >
-                1
-            </Portal>
+                listenCurrent={listenCurrent}
+            />
             <Helmet
                 title={`Virtual trading ${fsym} with Bitfetch`}
                 metas={[
@@ -133,6 +135,10 @@ const CandleChart = React.forwardRef<HTMLDivElement, RenderProps>(({
                 >
                     {fsym} - {tsym}
                 </text>
+                <HistoType
+                    height={marginTop / 2}
+                    y={marginTop / 2}
+                />
                 <g
                     transform={`translate(0, ${marginTop})`}
                 >
