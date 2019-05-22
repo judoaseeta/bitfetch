@@ -1,0 +1,4 @@
+@mixin createArea($areaName){
+  grid-area: $areaName;
+  background-color: #b33939;
+}

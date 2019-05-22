@@ -9,6 +9,16 @@
   & svg {
 
   }
+  & .button {
+    display: none;
+    &.active {
+      display: block;
+      position: absolute;
+      top: 3px;
+      right: 3px;
+    }
+
+  }
   &.fsym {
     font-size: 25px;
 

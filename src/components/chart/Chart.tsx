@@ -11,12 +11,12 @@ import Circle from './Circle';
 import Current from './Current';
 import Disconnected from './Disconnected';
 import Gradient from './Gradient';
-import HistoType from './HistoType';
+import HistoTypes from './HistoTypes';
 // import Indicator from './Indicator';
 import Indicators from './Indicators';
 import Loading from './Loading';
 import Line from './Line';
-import Portal from '../../utils/Portal';
+import Menu from './Menu';
 import Stick from './Stick';
 import Symbols from './Symbols';
 import Volume from './Volume';
@@ -29,6 +29,7 @@ import * as styles from './styles/CandleChart.scss';
 import * as symbolStyles from './styles/Symbols.scss';
 import * as axisStyles from './styles/Axis.scss';
 
+const candleStyle = bind(styles);
 const symbolStyle = bind(symbolStyles);
 const CandleChart = React.forwardRef<HTMLDivElement, RenderProps>(({
                                           bandwidth,
@@ -40,6 +41,7 @@ const CandleChart = React.forwardRef<HTMLDivElement, RenderProps>(({
                                           listenCurrent,
                                           line,
                                           isDisconnected,
+                                          isMenuOn,
                                           marginRight,
                                           marginTop,
                                           minimum,
@@ -49,6 +51,7 @@ const CandleChart = React.forwardRef<HTMLDivElement, RenderProps>(({
                                           flag,
                                           histo,
                                           tsym,
+                                          toggleMenu,
                                           type,
                                           width,
                                           volumeChartHeight,
@@ -65,6 +68,16 @@ const CandleChart = React.forwardRef<HTMLDivElement, RenderProps>(({
                 isActive={isDisconnected}
                 listenCurrent={listenCurrent}
             />
+            <Menu
+                isMenuOn={isMenuOn}
+                toggleMenu={toggleMenu}
+            />
+            <button
+                className={candleStyle('button', {
+                    active: !isMenuOn
+                })}
+                onClick={toggleMenu}
+            >Menu</button>
             <Helmet
                 title={`Virtual trading ${fsym} with Bitfetch`}
                 metas={[
@@ -135,10 +148,6 @@ const CandleChart = React.forwardRef<HTMLDivElement, RenderProps>(({
                 >
                     {fsym} - {tsym}
                 </text>
-                <HistoType
-                    height={marginTop / 2}
-                    y={marginTop / 2}
-                />
                 <g
                     transform={`translate(0, ${marginTop})`}
                 >
@@ -260,6 +269,7 @@ const CandleChart = React.forwardRef<HTMLDivElement, RenderProps>(({
                     y={height - volumeChartHeight - volumeChartMarginTop}
                     histo={histo}
                 />)}
+                // component for drawing line when histoType is neither 'live' nor '3d'
                 {IsTrue(histo !== 'live' && histo !== '3d' , <line
                     stroke="white"
                     strokeWidth="1px"
@@ -268,11 +278,13 @@ const CandleChart = React.forwardRef<HTMLDivElement, RenderProps>(({
                     y1={height - volumeChartHeight - volumeChartMarginTop}
                     y2={height - volumeChartHeight - volumeChartMarginTop}
                 />)}
+                //
                 <Current
                     current={current}
                     x={width - marginRight}
                     y={yScale(current) - 12.5 + marginTop}
                 />
+                // component for loading indicator
                 {IsTrue(loading, <Loading
                     width={width}
                     height={height}

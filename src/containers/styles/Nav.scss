@@ -1,6 +1,8 @@
 .container {
   display: flex;
+  justify-content: space-between;
   background-color: #487eb0;
+  width: 100%;
   > nav {
     display: flex;
     > ul {
@@ -14,6 +16,8 @@
   }
   & .search {
     display:flex;
+
+
     justify-content: center;
     align-items: center;
     position: relative;

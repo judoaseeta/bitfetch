@@ -1,0 +1,11 @@
+.innerContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-areas:
+  "a a l"
+  ". t t"
+  "p p p";
+  gap: 20px;
+  width: 100%;
+  height: 100%;
+}

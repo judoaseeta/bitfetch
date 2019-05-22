@@ -4,8 +4,6 @@ import { connect } from 'react-redux';
 import { bindActionCreators, Dispatch, Reducer} from 'redux';
 import { Epic,  ofType } from 'redux-observable';
 import { mergeMap, tap , map } from 'rxjs/operators';
-import { extent } from 'd3-array';
-import { Area } from "d3-shape";
 import {scaleLinear, ScaleLinear, scaleTime, ScaleTime} from 'd3-scale';
 
 import { requestTopCoinData } from '../utils/api';
@@ -56,22 +54,22 @@ const mapStateToProps = (state: RootState) => {
 const mapDispatchToProps = (dispatch: Dispatch) => ({
     ...bindActionCreators({...dispatchers}, dispatch)
 });
-declare namespace AreaChart {
-    export type RenderProp = AreaChart.State;
-    export type Props = {
-        children: (rp: RenderProp) => JSX.Element;
-        currentCoinSymbol: string;
-        histo: string;
-        tsym?: string;
-    } & ReturnType<typeof mapDispatchToProps>
-    & ReturnType<typeof mapStateToProps>
-    & RouteComponentProps<{}>;
-    export type State = {
-        xScale: ScaleTime<Date, number>;
-        yScale: ScaleLinear<number, number>;
-    };
-}
-class AreaChart extends React.Component<AreaChart.Props, AreaChart.State> {
+
+export type RenderProp = State;
+export type Props = {
+    children: (rp: RenderProp) => JSX.Element;
+    currentCoinSymbol: string;
+    histo: string;
+    tsym?: string;
+} & ReturnType<typeof mapDispatchToProps>
+& ReturnType<typeof mapStateToProps>
+& RouteComponentProps<{}>;
+export type State = {
+    xScale: ScaleTime<Date, number>;
+    yScale: ScaleLinear<number, number>;
+};
+
+class AreaChart extends React.Component<Props, State> {
     state = {
         xScale: scaleTime<Date, number>(),
         yScale: scaleLinear()

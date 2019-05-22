@@ -1,9 +1,13 @@
-.form {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  & .buttonHolder {
-    display: flex;
+@import '../../utils/utils';
+.container {
+ @extend %flexColumnAligned;
+  height: 100%;
+  & .form {
+    @extend %flexColumnAligned;
+    border: 1px solid black;
+    padding: 2em;
+    & .buttonHolder {
+      display: flex;
+    }
   }
 }

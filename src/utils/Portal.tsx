@@ -4,12 +4,17 @@ import * as styles from './Portal.scss';
 const cx = bind(styles);
 const Portal: React.SFC<{
     isActive: boolean;
-}> = ({ children, isActive, }) => (
+    hasClose?: boolean;
+    toggleActive?: React.MouseEventHandler<HTMLButtonElement>;
+}> = ({ children, isActive, hasClose, toggleActive }) => (
     <div
         className={cx('container', {
             active: isActive
         })}
     >
+        {
+            hasClose && <button onClick={toggleActive}>close</button>
+        }
         {children}
     </div>
 );

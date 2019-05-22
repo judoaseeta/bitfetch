@@ -1,6 +1,6 @@
-import Auth from "@aws-amplify/auth";
+import Auth from '@aws-amplify/auth';
 import { CognitoUser } from 'amazon-cognito-identity-js';
-import { AuthInfo, SignUpInfo, UserInfo } from '../containers/App';
+import { AuthInfo, SignUpInfo } from '../containers/App';
 import getUser from './getUser';
 
 export const signIn  = async({ username, password }: AuthInfo) => {
@@ -28,3 +28,4 @@ export const signUp = async({username, password, name}: SignUpInfo) => {
         throw e;
     }
 };
+export const signOut = () => Auth.signOut();

@@ -5,7 +5,8 @@ import * as styles from './index.scss';
 
 import Header from './Header';
 import CryptoChart  from '../../containers/CryptoChart';
-import CandleChart from '../chart/CandleChart';
+import Chart from '../chart/Chart';
+import Tester from './Tester';
 const TradeSystem: React.SFC<{
 
 } & RouteComponentProps<{ fsym: string }>> = ({ match }) => (
@@ -29,17 +30,21 @@ const TradeSystem: React.SFC<{
                       fsym,
                       height,
                       loading,
+                      listenCurrent,
                       isDisconnected,
+                      isMenuOn,
                       marginLeft,
                       marginRight,
                       marginTop,
                       minimum,
                       maximum,
                       selectedIndex,
+                      setHisto,
                       setSelectedIndex,
                       flag,
                       histo,
                       line,
+                      toggleMenu,
                       tsym,
                       type,
                       width,
@@ -48,14 +53,16 @@ const TradeSystem: React.SFC<{
                       volumeScale,
                       xScale,
                       yScale,
-                  }) => (<CandleChart
+                  }) => (<Chart
                             bandwidth={bandwidth}
                             current={current}
                             data={data!}
                             fsym={fsym}
                             loading={loading}
                             line={line}
+                            listenCurrent={listenCurrent}
                             isDisconnected={isDisconnected}
+                            isMenuOn={isMenuOn}
                             marginRight={marginRight}
                             marginTop={marginTop}
                             minimum={minimum}
@@ -67,19 +74,21 @@ const TradeSystem: React.SFC<{
                             width={width}
                             selectedIndex={selectedIndex}
                             setSelectedIndex={setSelectedIndex}
+                            setHisto={setHisto}
                             flag={flag}
                             volumeChartHeight={volumeChartHeight}
                             volumeChartMarginTop={volumeChartMarginTop}
                             volumeScale={volumeScale}
                             height={height}
                             containerRef={containerRef}
+                            toggleMenu={toggleMenu}
                             type={type}
                             marginLeft={marginLeft}
                 />)
                 }
             </CryptoChart>
         </main>
-        <footer>3</footer>
+        <Tester />
     </div>
 );
 

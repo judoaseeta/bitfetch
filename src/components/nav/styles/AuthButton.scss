@@ -1,0 +1,34 @@
+.authButton {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  align-items: center;
+  padding-left: 20px;
+  padding-right: 20px;
+  font-size: 14px;
+  color: white;
+  font-weight: bold;
+  & .userName:hover {
+    cursor: pointer;
+    text-decoration: underline;
+  }
+  > a:visited {
+    color: white;
+  }
+  > a:hover {
+    cursor: pointer;
+    text-decoration: underline;
+  }
+  > a:first-child {
+    margin-right: 10px;
+  }
+  & .hoverBar {
+    display: none;
+  }
+  &.signed {
+    & .hoverBar {
+      display: flex;
+    }
+  }
+
+}

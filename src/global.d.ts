@@ -1,5 +1,11 @@
+declare interface Window {
+    __initialData__: any;
+    __REDUX_DEVTOOLS_EXTENSION_COMPOSE__: any;
+    __authConfig__: any;
+}
 type Diff<T extends string | number | symbol, U extends string | number | symbol> = ({[P in T]: P } & {[P in U]: never } & { [x: string]: never })[T];
 type Omit<T, K extends keyof T> = Pick<T, Diff<keyof T , K>>;
+
 declare module '*.scss' {
     interface IClassNames {
         [className: string]: string
@@ -102,7 +108,8 @@ interface MultiCoinResp {
     name: string;
     resp: Promise<CoinHistoDataResp>;
 }
-declare interface Window {
-    __REDUX_DEVTOOLS_EXTENSION_COMPOSE__: any;
-    __initialData__: any;
+declare enum AuthInputType {
+    email = 'email',
+    password = 'password',
+    name = 'name',
 }

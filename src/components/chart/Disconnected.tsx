@@ -5,8 +5,8 @@ import * as styles from './styles/Disconnected.scss';
 
 const Disconnected: React.SFC<{
     isActive: boolean;
-    reconnectCurrent : React.MouseEventHandler<HTMLSpanElement>;
-}> = ({ isActive, reconnectCurrent, }) => (
+    listenCurrent : React.MouseEventHandler<HTMLSpanElement>;
+}> = ({ isActive, listenCurrent, }) => (
     <Portal
         isActive={isActive}
     >
@@ -15,7 +15,7 @@ const Disconnected: React.SFC<{
         >
             <h4>Live price is disconnected.</h4>
             <p>Do you want to <span
-                onClick={reconnectCurrent}
+                onClick={listenCurrent}
             >reconnect?</span></p>
         </div>
     </Portal>

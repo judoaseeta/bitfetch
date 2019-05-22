@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { HelmetData } from 'react-helmet';
 import { config } from 'dotenv';
+import { AuthOptions } from '@aws-amplify/auth/lib/types/Auth';
 import { RootState } from '../containers';
 config();
 
@@ -11,10 +12,11 @@ config();
         @doms = static string value of React Components.
 */
 const Html: React.SFC<{
+    authConfig: AuthOptions;
     state: RootState,
     helmet: HelmetData;
     doms: string;
-}> = ({ state, helmet, doms }) => {
+}> = ({ authConfig, state, helmet, doms }) => {
     const htmlAttrs = helmet.htmlAttributes.toComponent();
     const bodyAttrs = helmet.bodyAttributes.toComponent();
     const NODE_ENV = process.env.NODE_ENV;
@@ -47,7 +49,9 @@ const Html: React.SFC<{
         <script
             charSet="UTF-8"
             dangerouslySetInnerHTML={{
-                __html:`window.__initialData__= ${JSON.stringify(state).replace(/</g, '\\u003c')};`,
+                __html:`
+                window.__initialData__= ${JSON.stringify(state).replace(/</g, '\\u003c')},
+                window.__authConfig__= ${JSON.stringify(authConfig).replace(/</g, '\\u003c')}`,
             }} />
         {
             NODE_ENV === 'development'

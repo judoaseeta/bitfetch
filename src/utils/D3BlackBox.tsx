@@ -7,6 +7,10 @@ export interface BlackBoxProps  {
 interface BlackBoxState {
     ref: React.RefObject<SVGGElement>;
 }
+/*
+    D3BlackBox(func(p: Props,s: State ): void) : React.Component<Props, State>
+
+ */
 function D3BlackBox<P extends BlackBoxProps>(func: (p: P, s?: BlackBoxState) => void) {
     return class extends React.Component<P, BlackBoxState> {
         state = {

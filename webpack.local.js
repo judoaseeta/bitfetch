@@ -77,7 +77,8 @@ module.exports = [
                             options: {
                                 // 나중에 입력
                             }
-                        }
+                        },
+
                     ],
                 },
             ]

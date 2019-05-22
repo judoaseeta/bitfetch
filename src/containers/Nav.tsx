@@ -4,6 +4,7 @@ import {map, distinctUntilChanged, debounceTime } from 'rxjs/operators';
 
 import NavItem from '../components/nav/NavItem';
 import SymbolSearch from '../components/nav/SymbolSearch';
+import AuthButton from '../components/nav/AuthButton';
 import * as styles from './styles/Nav.scss';
 
 const NavItems = [
@@ -26,6 +27,7 @@ declare namespace Nav {
         filteredCoinList: any[];
         filterKeyword: string;
         searching: boolean;
+        isUserMenuOn:boolean;
     }
 }
 class Nav extends React.Component<Nav.Props, Nav.State> {
@@ -33,6 +35,7 @@ class Nav extends React.Component<Nav.Props, Nav.State> {
         eventSubject: new Subject<string>(),
         filteredCoinList: [],
         filterKeyword: '',
+        isUserMenuOn:false,
         searching: false,
     };
     componentDidMount() {
@@ -85,15 +88,16 @@ class Nav extends React.Component<Nav.Props, Nav.State> {
                                 to={item.to}
                             />)}
                     </ul>
+                    <SymbolSearch
+                        searching={this.state.searching}
+                        setFilterKeyword={this.setFilterKeyword}
+                        setSearching={this.setSearching}
+                        filteredCoinList={this.state.filteredCoinList}
+                        filterKeyword={this.state.filterKeyword}
+                        loaded={this.props.loaded}
+                    />
                 </nav>
-                <SymbolSearch
-                    searching={this.state.searching}
-                    setFilterKeyword={this.setFilterKeyword}
-                    setSearching={this.setSearching}
-                    filteredCoinList={this.state.filteredCoinList}
-                    filterKeyword={this.state.filterKeyword}
-                    loaded={this.props.loaded}
-                />
+                <AuthButton/>
             </header>
         );
     }
