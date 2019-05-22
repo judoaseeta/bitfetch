@@ -1,0 +1,12 @@
+.authIcon {
+  font-size: 20px;
+  &.name {
+    font-size: 17px;
+  }
+  &.error {
+    color: red;
+  }
+  &.validated {
+    color: green;
+  }
+}
