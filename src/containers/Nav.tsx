@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Subject } from 'rxjs';
 import {map, distinctUntilChanged, debounceTime } from 'rxjs/operators';
+import {RouteComponentProps, withRouter} from 'react-router-dom';
 
 import NavItem from '../components/nav/NavItem';
 import SymbolSearch from '../components/nav/SymbolSearch';
@@ -17,20 +18,19 @@ const NavItems = [
         to: '/market'
     }
 ];
-declare namespace Nav {
-    export type Props = {
-        coinList: any[];
-        loaded: boolean;
-    }
-    export interface State {
-        eventSubject: Subject<string>;
-        filteredCoinList: any[];
-        filterKeyword: string;
-        searching: boolean;
-        isUserMenuOn:boolean;
-    }
+
+export type Props = {
+    coinList: any[];
+    loaded: boolean;
+} & RouteComponentProps;
+export interface State {
+    eventSubject: Subject<string>;
+    filteredCoinList: any[];
+    filterKeyword: string;
+    searching: boolean;
+    isUserMenuOn:boolean;
 }
-class Nav extends React.Component<Nav.Props, Nav.State> {
+class Nav extends React.Component<Props, State> {
     state = {
         eventSubject: new Subject<string>(),
         filteredCoinList: [],
@@ -39,16 +39,16 @@ class Nav extends React.Component<Nav.Props, Nav.State> {
         searching: false,
     };
     componentDidMount() {
-        console.log(this.props);
         this.state.eventSubject.pipe(
             debounceTime(200),
             distinctUntilChanged(),
             map((d => {
-                if(d === '') {
+                let replacedString = d.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, "\\$&");
+                if(replacedString === '') {
                     return [];
                 }
                 let result = [];
-                let regex = new RegExp(d, 'i');
+                let regex = new RegExp(replacedString, 'i');
                 for (let [key, value] of this.props.coinList) {
                     if (key.match(regex)) {
                         result.push(value);
@@ -64,6 +64,11 @@ class Nav extends React.Component<Nav.Props, Nav.State> {
     }
     componentDidUpdate() {
         console.log(this.state);
+    }
+    shouldComponentUpdate(nextProps: Readonly<Props>, nextState: Readonly<State>, nextContext: any): boolean {
+        const { coinList, match } = this.props;
+        const { filteredCoinList, filterKeyword } = this.state;
+        return (coinList !== nextProps.coinList)  || (match.params !== nextProps.match.params) || (filteredCoinList !== nextState.filteredCoinList) || (filterKeyword !== nextState.filterKeyword);
     }
     setFilterKeyword = (e: React.ChangeEvent<HTMLInputElement>) => {
         e.persist();
@@ -103,4 +108,4 @@ class Nav extends React.Component<Nav.Props, Nav.State> {
     }
 }
 
-export default Nav;
+export default withRouter(Nav);
