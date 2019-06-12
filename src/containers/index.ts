@@ -1,16 +1,13 @@
 import { applyMiddleware, combineReducers, compose, createStore  } from 'redux';
 import { combineEpics, createEpicMiddleware } from 'redux-observable';
 import { epics as MainEpics, reducer as MainReducer } from './App';
-import { epics as AreaEpics, reducer as AreaReducer } from './AreaChart';//
 import { epics as CryptoEpics,  reducer as CryptoReducer } from './CryptoChart';
 const rootEpics = combineEpics(
-    ...AreaEpics,
     ...CryptoEpics,
     ...MainEpics,
 );
 
 const rootReducer = combineReducers({
-    area: AreaReducer,
     chart: CryptoReducer,
     main : MainReducer,
 });
