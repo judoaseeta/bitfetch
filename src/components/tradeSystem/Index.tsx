@@ -4,86 +4,38 @@ import { RouteComponentProps, withRouter } from 'react-router-dom';
 import * as styles from './index.scss';
 
 import Header from './Header';
+import AreaChart from '../../containers/AreaChart';
 import CryptoChart  from '../../containers/CryptoChart';
 import Chart from '../chart/Chart';
 import Tester from './Tester';
-const TradeSystem: React.SFC<{
+import Helmet from '../../utils/HelmetCompo';
+const TradeSystem: React.FunctionComponent<{
 
-} & RouteComponentProps<{ fsym: string }>> = ({ match }) => (
+} & RouteComponentProps<{ fsym: string }>> = ({ match: { params: { fsym } } }) => (
     <div
         className={styles.container}
     >
         <Header
-            fsym={match.params.fsym}
+            fsym={fsym}
+        />
+        <Helmet
+            title={`Virtual trading ${fsym} with Bitfetch`}
+            metas={[
+                {
+                    name: 'keywords',
+                    content:`${fsym}, virtual, trading, crypto-currency, crypto currencies,bitcoin, live candle chart, historic price`
+                }
+            ]}
         />
         <main>
-            <div>2-1</div>
+
+            <div><AreaChart width={200} height={50}>{() => <div>12</div>}</AreaChart></div>
             <CryptoChart
                 width={700}
                 height={400}
             >
-                {({
-                      bandwidth,
-                      current,
-                      containerRef,
-                      data,
-                      fsym,
-                      height,
-                      loading,
-                      listenCurrent,
-                      isDisconnected,
-                      isMenuOn,
-                      marginLeft,
-                      marginRight,
-                      marginTop,
-                      minimum,
-                      maximum,
-                      selectedIndex,
-                      setHisto,
-                      setSelectedIndex,
-                      flag,
-                      histo,
-                      line,
-                      toggleMenu,
-                      tsym,
-                      type,
-                      width,
-                      volumeChartHeight,
-                      volumeChartMarginTop,
-                      volumeScale,
-                      xScale,
-                      yScale,
-                  }) => (<Chart
-                            bandwidth={bandwidth}
-                            current={current}
-                            data={data!}
-                            fsym={fsym}
-                            loading={loading}
-                            line={line}
-                            listenCurrent={listenCurrent}
-                            isDisconnected={isDisconnected}
-                            isMenuOn={isMenuOn}
-                            marginRight={marginRight}
-                            marginTop={marginTop}
-                            minimum={minimum}
-                            maximum={maximum}
-                            histo={histo}
-                            tsym={tsym}
-                            xScale={xScale}
-                            yScale={yScale}
-                            width={width}
-                            selectedIndex={selectedIndex}
-                            setSelectedIndex={setSelectedIndex}
-                            setHisto={setHisto}
-                            flag={flag}
-                            volumeChartHeight={volumeChartHeight}
-                            volumeChartMarginTop={volumeChartMarginTop}
-                            volumeScale={volumeScale}
-                            height={height}
-                            containerRef={containerRef}
-                            toggleMenu={toggleMenu}
-                            type={type}
-                            marginLeft={marginLeft}
+                {(props) => (<Chart
+                        {...props}
                 />)
                 }
             </CryptoChart>
