@@ -1,7 +1,6 @@
 import * as React from 'react';
 import {max, min} from 'd3-array';
 // helmet
-import Helmet from '../../utils/HelmetCompo';
 // chart children components.
 import AxisBottom from './AxisBottom';
 import AxisRight from './AxisRight';
@@ -78,15 +77,6 @@ const CandleChart = React.forwardRef<HTMLDivElement, RenderProps>(({
                 })}
                 onClick={toggleMenu}
             >Menu</button>
-            <Helmet
-                title={`Virtual trading ${fsym} with Bitfetch`}
-                metas={[
-                    {
-                        name: 'keywords',
-                        content:`${fsym}, virtual, trading, crypto-currency, crypto currencies,bitcoin, live candle chart, historic price`
-                    }
-                ]}
-            />
             <svg
                 viewBox='0 0 700 400'
                 width='100%'
@@ -200,7 +190,7 @@ const CandleChart = React.forwardRef<HTMLDivElement, RenderProps>(({
                                 />
                             }
                             {data && data.map((dt, index) => (<Candle
-                                key={`${dt.open}${index}`}
+                                key={`${dt.open}${dt.time}`}
                                 open={dt.open}
                                 close={dt.close}
                                 x={xScale(dt.time)!}
@@ -254,7 +244,7 @@ const CandleChart = React.forwardRef<HTMLDivElement, RenderProps>(({
                 >
                     {data && data.map((dt, index) =>
                         <Volume
-                            key={`${dt.volumeto}${dt.volumefrom}`}
+                            key={`${dt.volumeto}${dt.time}`}
                             selected={index === selectedIndex}
                             x={xScale(dt.time)! + Math.floor(bandwidth * 0.15)}
                             y={volumeScale(dt.volumefrom)}
