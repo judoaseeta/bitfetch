@@ -1,12 +1,15 @@
 import * as React from 'react';
-import { Subject } from 'rxjs';
-import {map, distinctUntilChanged, debounceTime } from 'rxjs/operators';
+import {Subject, from } from 'rxjs';
+import {map, distinctUntilChanged, debounceTime, toArray, filter, switchMap, tap, startWith } from 'rxjs/operators';
 import {RouteComponentProps, withRouter} from 'react-router-dom';
+import { connect } from 'react-redux';
 
 import NavItem from '../components/nav/NavItem';
 import SymbolSearch from '../components/nav/SymbolSearch';
 import AuthButton from '../components/nav/AuthButton';
 import * as styles from './styles/Nav.scss';
+import {RootState} from "./index";
+
 
 const NavItems = [
     {
@@ -19,73 +22,102 @@ const NavItems = [
     }
 ];
 
-export type Props = {
-    coinList: any[];
-    loaded: boolean;
-} & RouteComponentProps;
+
+// Reducers.
+export type Props = ReturnType<typeof MapStateToProps> & RouteComponentProps;
 export interface State {
     eventSubject: Subject<string>;
-    filteredCoinList: any[];
     filterKeyword: string;
+    filteredCoinList: CoinListData[];
     searching: boolean;
     isUserMenuOn:boolean;
 }
+const MapStateToProps = (state: RootState) => ({
+    coinList: state.main.coinList,
+    loaded: state.main.loaded,
+});
 class Nav extends React.Component<Props, State> {
     state = {
         eventSubject: new Subject<string>(),
-        filteredCoinList: [],
         filterKeyword: '',
+        filteredCoinList: [],
         isUserMenuOn:false,
         searching: false,
     };
-    componentDidMount() {
+    componentDidMount(): void {
         this.state.eventSubject.pipe(
-            debounceTime(200),
+            tap(d => this.setState({ filterKeyword: d})),
+            debounceTime(400),
             distinctUntilChanged(),
-            map((d => {
+            switchMap(d => {
+                const upperCasedKeyword = d.toUpperCase();
+                // to replace any unnecessary characters such as -[]{}()*+?.,\^.
                 let replacedString = d.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, "\\$&");
                 if(replacedString === '') {
                     return [];
                 }
-                let result = [];
                 let regex = new RegExp(replacedString, 'i');
-                for (let [key, value] of this.props.coinList) {
-                    if (key.match(regex)) {
-                        result.push(value);
-                    }
-                }
-                return result;
-            }))
-        ).subscribe({
-            next: val => this.setState({
-                filteredCoinList: val,
-            })
-        });
+                return from(this.props.coinList!).pipe(
+                    filter(item => regex.test(item[0])),
+                    map(d => d[1]),
+                    toArray(),
+                    tap( d =>this.setState({ filteredCoinList: d}))
+                );
+            }),
+        ).subscribe();
     }
-    componentDidUpdate() {
-        console.log(this.state);
+
+    componentDidUpdate(prevProps: Props) {
+        const { pathname } = this.props.location;
+        const { searching } = this.state;
+        if(pathname !== prevProps.location.pathname && searching) {
+            this.setState({
+                searching: false,
+            });
+        }
     }
     shouldComponentUpdate(nextProps: Readonly<Props>, nextState: Readonly<State>, nextContext: any): boolean {
         const { coinList, match } = this.props;
-        const { filteredCoinList, filterKeyword } = this.state;
-        return (coinList !== nextProps.coinList)  || (match.params !== nextProps.match.params) || (filteredCoinList !== nextState.filteredCoinList) || (filterKeyword !== nextState.filterKeyword);
+        const { filterKeyword, searching, filteredCoinList } = this.state;
+        return (
+            coinList !== nextProps.coinList)  ||
+            (match.params !== nextProps.match.params) ||
+            (filteredCoinList !== nextState.filteredCoinList) ||
+            (filterKeyword !== nextState.filterKeyword) ||
+            (searching !== nextState.searching);
     }
     setFilterKeyword = (e: React.ChangeEvent<HTMLInputElement>) => {
         e.persist();
-        this.setState({
-            filterKeyword: e.target.value,
-        }, () => this.state.eventSubject.next(e.target.value));
+        if(this.props.coinList) {
+            this.state.eventSubject.next(e.target.value);
+        }
     };
     setSearching = (e: React.FocusEvent<HTMLInputElement>) => {
-        this.setState((prev) => ({ searching: !prev.searching}))
+
+        console.log(e.relatedTarget, e.type);
+        // if event type is blur then searching will be set to false, searching modal will be disappeared.
+        if(e.type === 'blur') {
+            // check whether relatedTarget is for preventing false is assigned to 'searching'
+            // to navigate where the user wants to go
+            if(e.relatedTarget !== null) {
+                return;
+            }
+            this.setState({ searching: false });
+        } else if(e.type === 'focus') {
+            this.setState({ searching: true });
+        }
     };
     render() {
         return (
             <header
                 className={styles.container}
             >
-                <nav>
-                    <ul>
+                <nav
+                    className={styles.navMenu}
+                >
+                    <ul
+                        className={styles.navItems}
+                    >
                         {NavItems.map(item =>
                             <NavItem
                                 key={item.name}
@@ -108,4 +140,4 @@ class Nav extends React.Component<Props, State> {
     }
 }
 
-export default withRouter(Nav);
+export default withRouter(connect(MapStateToProps)(Nav));
