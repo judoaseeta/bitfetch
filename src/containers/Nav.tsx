@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {Subject, from } from 'rxjs';
-import {map, distinctUntilChanged, debounceTime, toArray, filter, switchMap, tap, startWith } from 'rxjs/operators';
+import { distinctUntilChanged, debounceTime, filter, switchMap, tap, reduce } from 'rxjs/operators';
 import {RouteComponentProps, withRouter} from 'react-router-dom';
 import { connect } from 'react-redux';
 
@@ -59,9 +59,13 @@ class Nav extends React.Component<Props, State> {
                 let regex = new RegExp(replacedString, 'i');
                 return from(this.props.coinList!).pipe(
                     filter(item => regex.test(item[0])),
-                    map(d => d[1]),
-                    toArray(),
-                    tap( d =>this.setState({ filteredCoinList: d}))
+                    reduce((acc,curr)=> {
+                        if(curr[0] === upperCasedKeyword) {
+                            return [curr[1], ...acc];
+                        }
+                        return [...acc,curr[1]];
+                    },[] as CoinListData[]),
+                    tap( d =>this.setState({ filteredCoinList: d})),
                 );
             }),
         ).subscribe();
