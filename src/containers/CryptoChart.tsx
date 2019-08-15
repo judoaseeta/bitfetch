@@ -2,7 +2,9 @@ import * as React from 'react';
 /// REDUX
 import { connect } from 'react-redux';
 import {Action , bindActionCreators, Dispatch, Reducer} from 'redux';
-import {catchError, mergeMap, switchMap, map, takeUntil, tap, startWith} from 'rxjs/operators';
+
+// Rxjs
+import {catchError ,mergeMap, switchMap, map, takeUntil, tap, startWith} from 'rxjs/operators';
 import { from, of } from 'rxjs';
 import {ActionsObservable, Epic, ofType} from 'redux-observable';
 // REACT ROUTER
@@ -10,18 +12,20 @@ import {RouteComponentProps, withRouter} from 'react-router-dom';
 import { parse } from 'query-string';
 
 // D3 dependencies.
-import {scaleLinear, scaleBand,scaleTime, ScaleTime, ScaleBand, ScaleLinear } from 'd3-scale';
-import { extent ,min, max } from 'd3-array';
+import {scaleLinear, scaleBand, ScaleBand, ScaleLinear } from 'd3-scale';
+import { min, max } from 'd3-array';
 import { line, Line  } from 'd3-shape';
 // rest of 3rd parties.
 /// local dependencies.
 
 import {createAction, ActionsUnion, ActionWithPayload} from '../utils/createAction';
-import { createCurrentSubcription, generateUrlForCurrencyApi, createSocketCoin } from '../utils/api';
+import { createCurrentSubcription, createSocketCoin, requestCurrencyData } from '../utils/api';
+import mappingCurrent from '../utils/mappingCurrent';
 import { RootState } from './';
 import { MappedHistoData, MappedHistoDataType, mappingResponse } from '../utils/histoDataMapper';
+import mapDataWithCurrent from '../utils/mapDatawithCurrent';
 // @ts-ignore
-import DecodeMessage from '../utils/decodeMessage';
+import DecodeMessage from '../utils/decodeMessage.js';
 
 export enum actionTypes {
     CATCH_ERROR = 'CATCH_ERROR',
@@ -53,13 +57,6 @@ export const dispatchers = {
 // type definitions for all actions.
 type Actions = ActionsUnion<typeof dispatchers>;
 
-const mappingCurrent = (sub: string) => {
-    let decodedSub = DecodeMessage.CURRENT.unpack(sub);
-    return {
-        ...decodedSub,
-        FLAGS: Number(decodedSub.FLAGS)
-    }
-};
 //// Epic for listening current price via websocket.
 
 const SubscribeSingleCurrentEpic: Epic<Actions> = (action$: ActionsObservable<Actions>) => action$.pipe(
@@ -85,7 +82,7 @@ map((data: CoinHistoDataResp) => ({ ...data, Data: mappingDate(data.Data), time:
 const DataEpic: Epic<Actions> = (action$: ActionsObservable<Actions>, _)=> action$.pipe(
     ofType<Actions, ActionWithPayload<actionTypes.REQUEST_INITIAL_DATA, ApiRequestInput>, actionTypes.REQUEST_INITIAL_DATA>(actionTypes.REQUEST_INITIAL_DATA),
     mergeMap(action =>
-        from<MappedHistoData>(fetch(generateUrlForCurrencyApi(action.payload)).then((res: any) => res.json())).pipe(
+        from(requestCurrencyData(action.payload)).pipe(
             map((data: any) => mappingResponse(data)),
             map((data: MappedHistoData) => dispatchers.REQUEST_SUCCESS(data)),
             startWith(dispatchers.LISTEN_CURRENT(action.payload)),
@@ -100,16 +97,7 @@ export const epics = [ DataEpic, SubscribeSingleCurrentEpic ];
 
 
 
-const mapDataWithCurrent = (data: MappedHistoDataType[], price: number) => {
-    let { high, close, open, low, ...rest } = data[data.length - 1];
-    if(high < price){
-        high = price;
-    } else if (low > price) {
-        low = price;
-    }
-    close = price;
-    return [...data.slice(0, data.length - 1), { high, close, open, low, ...rest}];
-};
+
 interface ChartReducer {
     chartData: {
         data: MappedHistoDataType[],
@@ -171,6 +159,10 @@ export const reducer: Reducer<ChartReducer, Actions> = (state = initialState, ac
             };
         case actionTypes.CATCH_ERROR:
             if(action.payload === 'disconnected') {
+                if(!state.chartData.listening) {
+                    console.log('yes!');
+                    return state;
+                }
                 return {
                     ...state,
                     chartData: {
@@ -204,7 +196,7 @@ export enum ChartTypes {
     line = 'line',
     candle = 'candle'
 }
-export type RenderProps = CryptoChart.State & {
+export type RenderProps = State & {
     current: number;
     setSelectedIndex: (num: number) => React.MouseEventHandler<SVGRectElement|SVGElement>;
     setHisto: (histo: string) => React.MouseEventHandler<HTMLButtonElement>;
@@ -215,7 +207,6 @@ export type RenderProps = CryptoChart.State & {
     fsym: string;
     tsym: string;
 };
-declare namespace CryptoChart {
 
     // type ChartTypes = 'line' | 'candle';
     export type Props = {
@@ -246,7 +237,6 @@ declare namespace CryptoChart {
         loading: boolean;
         line: Line<MappedHistoDataType>;
         height: number;
-        histo: string;
         isMenuOn: boolean;
         selectedIndex: number;
         containerRef: React.RefObject<HTMLDivElement>;
@@ -255,7 +245,6 @@ declare namespace CryptoChart {
         marginRight: number;
         maximum: number;
         minimum: number;
-        tsym: string;
         type: ChartTypes;
         volumeChartHeight: number;
         volumeChartMarginTop: number;
@@ -264,20 +253,18 @@ declare namespace CryptoChart {
         yScale: ScaleLinear<number,number>;
         volumeScale: ScaleLinear<number, number>;
     }
-}
-class CryptoChart extends React.Component<CryptoChart.Props, CryptoChart.State> {
+class CryptoChart extends React.Component<Props, State> {
     static defaultProps = {
         width: 600,
         height: 600
     };
-    state = {
+    state: State = {
         bandwidth: 0,
         data: [],
         flag: -1,
         loading: true,
         line: line<MappedHistoDataType>(),
         height: 0,
-        histo: parse(this.props.location.search).histo || 'live',
         isMenuOn: false,
         selectedIndex: -1,
         containerRef: React.createRef<HTMLDivElement>(),
@@ -286,7 +273,6 @@ class CryptoChart extends React.Component<CryptoChart.Props, CryptoChart.State> 
         marginRight: 70,
         maximum: 0,
         minimum: 0,
-        tsym: parse(this.props.location.search).tsym || 'USD',
         type: ChartTypes.candle,
         volumeChartHeight: 0,
         volumeChartMarginTop: 0,
@@ -295,10 +281,9 @@ class CryptoChart extends React.Component<CryptoChart.Props, CryptoChart.State> 
         yScale: scaleLinear(),
         volumeScale: scaleLinear()
     };
-    static getDerivedStateFromProps(nextProps: CryptoChart.Props, prevState: CryptoChart.State) {
-        let { marginRight, marginTop, histo, line ,volumeScale,xScale, yScale} = prevState;
+    static getDerivedStateFromProps(nextProps: Props, prevState: State) {
+        let { marginRight, marginTop, line ,volumeScale,xScale, yScale} = prevState;
         const { data, height, width, flag, isDisconnected } = nextProps;
-        histo = parse(nextProps.location.search).histo;
         if (prevState.width !== width || prevState.height !== height) {
             const volumeChartHeight = Math.floor(height / 6);
             const volumeChartMarginTop = Math.floor(height / 10);
@@ -312,14 +297,10 @@ class CryptoChart extends React.Component<CryptoChart.Props, CryptoChart.State> 
             }
         }
 
-        if(prevState.histo !== histo) {
-            return {
-                histo
-            };
-        }
         if (data.length && data !== prevState.data) {
+            // add some cache for preventing redundant calculation.
             let maximum = max(data, d => d.high);
-            let minimum = min(data, d => d.low);
+            let minimum =  min(data, d => d.low);
 
             xScale
                 .range([prevState.marginLeft, width - marginRight])
@@ -362,36 +343,32 @@ class CryptoChart extends React.Component<CryptoChart.Props, CryptoChart.State> 
         if(!this.props.data.length) {
             this.props.REQUEST_INITIAL_DATA({
                 fsym: this.props.match.params.fsym,
-                histo: this.props.location.search ? parse(this.props.location.search).histo : 'live',
-                tsym: this.props.location.search ? parse(this.props.location.search).tsym : 'USD',
+                histo: this.props.location.search ? parse(this.props.location.search).histo as string: 'live',
+                tsym: this.props.location.search ? parse(this.props.location.search).tsym as string : 'USD',
             });
         }
     }
-    componentDidUpdate(prevP: CryptoChart.Props, prevS: CryptoChart.State) {
+    componentDidUpdate(prevP: Props, prevS: State) {
         const { fsym } = this.props.match.params;
         // when url path params 'fsym' is changed
         if(prevP.match.params.fsym !== fsym) {
-            this.props.UNSUBSCRIBE();
-            this.props.REQUEST_INITIAL_DATA({
-                fsym:this.props.match.params.fsym,
-                histo: this.state.histo,
-                tsym: this.state.tsym
-            });
+            this.renewCurrencyData();
         }
-        if(prevS.histo !== this.state.histo) {
+        if(prevP.location.search !== this.props.location.search) {
             this.props.UNSUBSCRIBE();
             this.props.REQUEST_INITIAL_DATA({
                 fsym: fsym,
-                histo: this.state.histo,
-                tsym: this.state.tsym
+                histo: parse(this.props.location.search).histo as string,
+                tsym: parse(this.props.location.search).tsym as string
             });
         }
     }
     componentWillUnmount() {
         console.log('unmounted');
         this.props.UNSUBSCRIBE();
+        this.props.CLEAR();
     };
-    shouldComponentUpdate(nextProps: Readonly<CryptoChart.Props>, nextState: Readonly<CryptoChart.State>, nextContext: any): boolean {
+    shouldComponentUpdate(nextProps: Readonly<Props>, nextState: Readonly<State>, nextContext: any): boolean {
         const { fsym } = this.props.match.params;
         const { current } = nextProps;
         const { data, selectedIndex, isMenuOn } =  this.state;
@@ -402,14 +379,30 @@ class CryptoChart extends React.Component<CryptoChart.Props, CryptoChart.State> 
         console.log('donka')
         this.props.LISTEN_CURRENT({
             fsym: this.props.match.params.fsym,
-            tsym: this.props.location.search ? parse(this.props.location.search).tsym : 'USD',
+            tsym: this.props.location.search ? parse(this.props.location.search).tsym as string : 'USD',
         });
     };
     toggleLoading = (callback?: any) => this.setState({ loading: this.state.loading }, () => callback());
     // setHeightandWidth = (height, width) => this.setState({ width: width, height: height });
-    setSelectedIndex = (num: number) => (e: React.MouseEvent<SVGRectElement>) => this.setState({ selectedIndex: num });
+    setSelectedIndex = (num: number) => (e: React.MouseEvent<SVGRectElement>) =>{
+        e.stopPropagation();
+        this.setState({ selectedIndex: num });
+    };
     setHisto = (histo: string) => (e: React.MouseEvent<HTMLButtonElement>) => this.props.history.push(`/currencies/BTC?histo=${histo}`);
     toggleMenu = (e: React.MouseEvent<HTMLButtonElement>) => this.setState({ isMenuOn: !this.state.isMenuOn});
+    renewCurrencyData() {
+        this.setState({
+            loading: true
+        }, () => {
+            this.props.CLEAR();
+            this.props.UNSUBSCRIBE();
+            this.props.REQUEST_INITIAL_DATA({
+                fsym:this.props.match.params.fsym,
+                histo: parse(this.props.location.search).histo as string,
+                tsym: parse(this.props.location.search).tsym as string
+            });
+        })
+    }
     render() {
         return this.props.children({
             ...this.state,
@@ -417,9 +410,11 @@ class CryptoChart extends React.Component<CryptoChart.Props, CryptoChart.State> 
             fsym: this.props.match.params.fsym,
             listenCurrent: this.listenCurrent,
             isDisconnected: this.props.isDisconnected,
+            histo: parse(this.props.location.search).histo as string,
             setSelectedIndex: this.setSelectedIndex,
             setHisto: this.setHisto,
-            toggleMenu: this.toggleMenu
+            toggleMenu: this.toggleMenu,
+            tsym:  parse(this.props.location.search).tsym as string
         });
     }
 }
