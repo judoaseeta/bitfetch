@@ -3,8 +3,13 @@ declare interface Window {
     __REDUX_DEVTOOLS_EXTENSION_COMPOSE__: any;
     __authConfig__: any;
 }
+declare interface NodeModule {
+
+}
 type Diff<T extends string | number | symbol, U extends string | number | symbol> = ({[P in T]: P } & {[P in U]: never } & { [x: string]: never })[T];
 type Omit<T, K extends keyof T> = Pick<T, Diff<keyof T , K>>;
+
+// declaration for css module
 
 declare module '*.scss' {
     interface IClassNames {
@@ -12,6 +17,10 @@ declare module '*.scss' {
     }
     const classNames: IClassNames;
     export = classNames;
+}
+declare module "*.png" {
+    const value: any;
+    export = value;
 }
 interface Dictionary<T> {
     [key: string]: T;
@@ -106,10 +115,25 @@ interface CoinListData {
 }
 interface MultiCoinResp {
     name: string;
-    resp: Promise<CoinHistoDataResp>;
+    resp: CoinHistoDataResp;
 }
 declare enum AuthInputType {
     email = 'email',
     password = 'password',
     name = 'name',
+}
+interface DecodedCurrencyLiveData {
+    FLAGS: number
+    FROMSYMBOL:string
+    LASTTRADEID: number
+    LASTUPDATE: number
+    LASTVOLUMETO: number
+    MARKET: string
+    TOSYMBOL: string
+    TYPE: string
+    VOLUME24HOUR: number
+    VOLUME24HOURTO: number
+    VOLUMEHOUR: number
+    VOLUMEHOURTO: number
+    PRICE?: number
 }
