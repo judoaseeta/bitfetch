@@ -12,14 +12,14 @@
     cursor: pointer;
     text-decoration: underline;
   }
-  > a:visited {
+  & a:visited {
     color: white;
   }
-  > a:hover {
+  & a:hover {
     cursor: pointer;
     text-decoration: underline;
   }
-  > a:first-child {
+  & a:first-child {
     margin-right: 10px;
   }
   & .hoverBar {

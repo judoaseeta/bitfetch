@@ -2,14 +2,14 @@ import * as React from 'react';
 import { Link, withRouter, RouteComponentProps } from 'react-router-dom';
 
 import * as styles from './styles/SearchResultItem.scss';
-const SearchResultItem: React.SFC<{
+const SearchResultItem: React.FunctionComponent<{
     CoinName: string;
     Symbol: string;
 } & RouteComponentProps> = ({CoinName, Symbol, }) => (
     <li
         className={styles.container}
+        id={Symbol}
     >
-        <span>
             <Link
                 className={styles.link}
                 to={{
@@ -17,7 +17,6 @@ const SearchResultItem: React.SFC<{
                     search: '?histo=live'
                 }}
             >{CoinName}:{Symbol}</Link>
-        </span>
     </li>
 );
 

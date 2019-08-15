@@ -1,13 +1,15 @@
 import * as React from 'react';
 import SearchResultItem from './SearchResultItem';
+import ExtendSearchLink from './ExtendSearchLink';
 import * as styles from './styles/SearchResult.scss';
 import { bind } from 'classnames/bind';
 
 const cx = bind(styles);
-const SearchResult: React.SFC<{
+const SearchResult: React.FunctionComponent<{
     filteredCoinList: CoinListItem[];
+    filterKeyword: string;
     searching: boolean;
-}>= ({filteredCoinList, searching, }) => (
+}>= ({filteredCoinList, filterKeyword, searching, }) => (
     <ul
         className={cx('container', {
             on: searching && filteredCoinList && filteredCoinList.length > 0
@@ -21,6 +23,13 @@ const SearchResult: React.SFC<{
                     Symbol={item.Symbol}
                 />
             )
+        }
+        {
+            filteredCoinList && filteredCoinList.length > 10 &&
+                <ExtendSearchLink
+                    filterKeyword={filterKeyword}
+                    searchResultLength={filteredCoinList.length}
+                />
         }
     </ul>
 );

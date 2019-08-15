@@ -12,7 +12,7 @@ const AuthButton:React.SFC<
     ReturnType<typeof mapDispatchToProps>
 > = ({ isSignIn, email}) =>(
     <div
-        className={authButtonStyles({
+        className={authButtonStyles('authButton',{
             signed: isSignIn
         })}
     >

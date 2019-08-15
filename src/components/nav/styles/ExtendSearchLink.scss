@@ -1,0 +1,15 @@
+@import './SearchResultItem';
+
+.container {
+  background-color: #0a3d62;
+  &:hover {
+    background-color: #1e3799;
+  }
+  & .link {
+    color: white;
+    &:visited {
+      color: white;
+      text-decoration: none;
+    }
+  }
+}

@@ -1,7 +1,6 @@
+@import '../../../utils/utils';
 .item {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  @extend %flexRowAligned;
   padding: 1em;
   > a {
     text-decoration: none;

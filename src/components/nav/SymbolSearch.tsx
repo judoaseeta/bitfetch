@@ -2,15 +2,17 @@ import * as React from 'react';
 import * as styles from './styles/SymbolSearch.scss';
 import SearchInput from './SearchInput';
 import SearchResult from './SearchResult';
-const SymbolSearch: React.SFC<{
+
+
+const SymbolSearch: React.FunctionComponent<{
     filteredCoinList: CoinListItem[];
     filterKeyword: string;
     loaded: boolean;
     searching: boolean;
     setFilterKeyword: React.ChangeEventHandler<HTMLInputElement>;
     setSearching: React.FocusEventHandler<HTMLInputElement>;
-}> = ({ filteredCoinList,filterKeyword , loaded, searching,setFilterKeyword, setSearching, }) => (
-    <div
+}> = ({ filteredCoinList,filterKeyword , loaded, searching,setFilterKeyword, setSearching}) => (
+    <form
         className={styles.container}
     >
         <SearchInput
@@ -21,9 +23,10 @@ const SymbolSearch: React.SFC<{
         />
         <SearchResult
             filteredCoinList={filteredCoinList}
+            filterKeyword={filterKeyword}
             searching={searching}
         />
-    </div>
+    </form>
 );
 
 export default SymbolSearch;
