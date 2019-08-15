@@ -1,55 +1,40 @@
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const autoprefixer = require('autoprefixer');
 const nodeExternals = require('webpack-node-externals');
+const NodemonPlugin = require('nodemon-webpack-plugin');
+const path = require('path');
 require('dotenv').config();
-const client = require('./webpack.client.dev');
-module.exports = [
-    client,
-    {
+
+module.exports = {
+    mode: 'development',
+        name: 'server',
         entry: {
             server: './src/server/index.tsx',
         },
         output: {
-            path: __dirname + '/dist',
+            path: __dirname + '/dev/server',
             filename: `[name].js`
         },
-        optimization: {
-            splitChunks: {
-                cacheGroups: {
-                    styles: {
-                        name: 'styles',
-                        test: /\.css$/,
-                        chunks: 'all',
-                        enforce: true
-                    }
-                }
-            }
-        },
-        plugins: [
-            new MiniCssExtractPlugin({
-                // Options similar to the same options in webpackOptions.output
-                // both options are optional
-                filename: `[name].${process.env.CSS_VERSION}.css`
-            })
-        ],
         module: {
             rules: [
                 {
                     test: /\.(ts|tsx)$/,
-                    loader: "ts-loader",
                     exclude: /node_modules/,
+                    use: [
+                        // ts-loader will convert ts(x) to js first.
+                        {
+                            loader: "ts-loader"
+                        }
+                    ]
                 },
                 {
                     test: /\.scss$/,
                     use: [
-                        MiniCssExtractPlugin.loader,
                         {
-                            loader: require.resolve('css-loader'),
+                            loader: require.resolve('css-loader/locals'),
                             options: {
-                                importLoaders: 1,
+                                importLoaders: 2,
                                 modules: true,
                                 localIdentName: '[path][name]__[local]--[hash:base64:5]',
-                                sourceMap: true
                             },
                         },
                         {
@@ -78,16 +63,33 @@ module.exports = [
                                 // 나중에 입력
                             }
                         },
-
                     ],
+
+                },
+                {
+                    test: /\.(jpg|png)$/,
+                    use: {
+                        loader: "url-loader",
+                    },
                 },
             ]
         },
-        resolve: {
-            extensions: ['.ts', '.tsx', '.js', '.jsx'],
-        },
-        target: 'node',
         externals: [nodeExternals()],
-        devtool: 'cheap-module-source-map'
-    }
-];
+        devtool: 'cheap-module-source-map',
+    resolve: {
+        extensions: ['.ts', '.tsx', '.js', '.jsx', '.jpg', '.png'],
+        alias: {
+            Components: path.resolve(__dirname, 'src/components/'),
+            Containers: path.resolve(__dirname, 'src/containers/'),
+            Utils: path.resolve(__dirname, 'src/utils/')
+        }
+    },
+    plugins: [
+        new NodemonPlugin({
+            watch: './dev/server',
+            script: './dev/server/server.js',
+            ext: 'js'
+        }),
+    ],
+    target:'node',
+};
