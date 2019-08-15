@@ -1,0 +1,24 @@
+@import '../../../utils/utils';
+
+.listItem {
+  display: grid;
+  grid-template-columns: 2fr 1fr 2.3rem;
+  height: 2.3rem;
+  width: 20rem;
+  border: 0.06rem solid rgba(0,0,0, 0.4);
+  .coinNameHolder {
+    @extend %flexRowAligned;
+    font-size: 0.8rem;
+  }
+  .iconHolder {
+    @extend %flexRowAligned;
+  }
+
+  .imageHolder {
+    @extend %flexRowAligned;
+  }
+  .listItemImage {
+    width: 2rem;
+    height: 2rem;
+  }
+}

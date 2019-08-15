@@ -1,0 +1,12 @@
+@import '../../../utils/utils';
+
+.indicator {
+  border: 1px solid black;
+  @include CreateFlexLay(row, center, space-between);
+  -webkit-padding-start: 0;
+  -webkit-margin-before: 0;
+  -webkit-margin-after: 0;
+  list-style: none;
+  padding: 0.1rem;
+  margin-top: 0.6rem;
+}

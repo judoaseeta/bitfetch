@@ -1,0 +1,14 @@
+
+.list {
+  border: 1px solid black;
+  box-shadow: 6px 7px 3.5px 1.5px gray;
+  display: grid;
+  grid-template-rows: repeat(10, 1fr);
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 0.3rem;
+  -webkit-padding-start: 0;
+  -webkit-margin-before: 0;
+  -webkit-margin-after: 0;
+  list-style: none;
+  padding: 0.5rem;
+}
