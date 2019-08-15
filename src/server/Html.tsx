@@ -2,7 +2,7 @@ import * as React from 'react';
 import { HelmetData } from 'react-helmet';
 import { config } from 'dotenv';
 import { AuthOptions } from '@aws-amplify/auth/lib/types/Auth';
-import { RootState } from '../containers';
+import { RootState } from '../containers/';
 config();
 
 /*
@@ -10,8 +10,12 @@ config();
         @state = getState from redux Store
         @helmet = static string value from Helmet
         @doms = static string value of React Components.
+        <link
+                        href={`/static/client.${process.env.CSS_VERSION}.css`}
+                        rel="stylesheet"
+                    />
 */
-const Html: React.SFC<{
+const Html: React.FunctionComponent<{
     authConfig: AuthOptions;
     state: RootState,
     helmet: HelmetData;
@@ -30,12 +34,9 @@ const Html: React.SFC<{
             {helmet.link.toComponent()}
             {
                 NODE_ENV === 'development'
-                    ? <link
-                        href={`/static/client.${process.env.CSS_VERSION}.css`}
-                        rel="stylesheet"
-                    />
+                    ? <></>
                     : <link
-                        href={`https://s3.${process.env.REGION}.amazonaws.com/${process.env.BUCKET}/styles.${process.env.VERSION}.css`}
+                        href={`/static/client.${process.env.CSS_VERSION}.css`}
                         rel="stylesheet"
                     />
             }
@@ -58,13 +59,11 @@ const Html: React.SFC<{
                 ? <script
                     charSet="UTF-8"
                     type="text/javascript"
-                    crossOrigin="true"
-                    src={`/static/client.${process.env.VERSION}.js`}/>
+                    src={`/static/client-bundle.js`}/>
                 : <script
                     charSet="UTF-8"
                     type="text/javascript"
-                    crossOrigin="true"
-                    src={`https://s3.${process.env.REGION}.amazonaws.com/${process.env.BUCKET}/client.${process.env.VERSION}.js`}
+                    src={`/static/client.${process.env.VERSION}.js`}
                 />
         }
         </body>

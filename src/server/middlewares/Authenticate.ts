@@ -1,5 +1,5 @@
+;import { Response, NextFunction } from 'express';
 import { RequestWithVerified } from '../';
-import { Response, NextFunction } from 'express';
 import { CognitoUserSession, CognitoIdToken, CognitoAccessToken, CognitoRefreshToken } from 'amazon-cognito-identity-js';
 import gatherToken from '../../utils/gatherToken';
 const Authenticate = (req: RequestWithVerified, res: Response, next: NextFunction) => {

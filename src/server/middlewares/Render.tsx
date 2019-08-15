@@ -1,15 +1,14 @@
 import * as React from 'react';
 import {  Response } from 'express';
 import {Helmet} from "react-helmet";
-import { RequestWithVerified } from '../index';
+import { RequestWithVerified } from '../';
 import {ServerSideStore} from "../../containers/";
 import { authActions } from "../../containers/App";
 import template from "../template";
 import Html from "../Html";
 import {renderToString} from "react-dom/server";
-import {AuthOptions} from "@aws-amplify/auth/lib/types";
 
-const Render = (authConfig: AuthOptions) => (req: RequestWithVerified, res: Response) => {
+const Render = (req: RequestWithVerified, res: Response) => {
     const context = {};
     const helmet = Helmet.renderStatic();
     const store = ServerSideStore();
@@ -18,7 +17,7 @@ const Render = (authConfig: AuthOptions) => (req: RequestWithVerified, res: Resp
     }
     if(req.validated) store.dispatch(authActions.SIGN_IN_SUCCESS({ name: req.name!, email: req.email!}));
     const App = template(store, req, context);
-    const html = <Html authConfig={authConfig} state={store.getState()} helmet={helmet} doms={renderToString(App)}/>;
+    const html = <Html authConfig={req.authConfig!} state={store.getState()} helmet={helmet} doms={renderToString(App)}/>;
     res.status(200);
     res.write(`<!doctype html>\n${renderToString(html)}`);
     res.end();
