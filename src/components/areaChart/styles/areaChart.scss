@@ -1,0 +1,42 @@
+.coinName {
+  font-size: 14px;
+  user-select: none;
+}
+.price {
+  font-size: 12px;
+  user-select: none;
+  font-weight: bold;
+  &.rise {
+    fill: #b33939;
+  }
+  &.fall {
+    fill: #4b7bec;
+  }
+  &.same {
+    fill: black;
+  }
+}
+.chart {
+  width: 100%;
+  height: 100%;
+}
+.area {
+  stroke: none;
+  stroke-width: 1px;
+  fill: greenyellow;
+  fill-opacity: 0.7;
+}
+.current {
+  stroke: black;
+  stroke-width: 1px;
+  fill: black;
+  &.rise {
+    fill: #b33939;
+  }
+  &.fall {
+    fill: #4b7bec;
+  }
+  &.same {
+    fill: black;
+  }
+}
