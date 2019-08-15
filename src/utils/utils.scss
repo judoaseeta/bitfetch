@@ -8,3 +8,10 @@
   @extend %flexRowAligned;
   flex-direction: column;
 }
+
+@mixin CreateFlexLay($direction, $aligned: stretch, $justify: flex-start) {
+  display: flex;
+  flex-direction: $direction;
+  justify-content: $justify;
+  align-items: $aligned;
+}

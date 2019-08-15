@@ -1,8 +1,6 @@
 import * as React from 'react';
 import { Route, RouteProps, Redirect } from 'react-router-dom';
-import {RouteComponentProps} from "react-router";
 import {connect} from 'react-redux';
-import getUser from '../utils/getUser';
 import {RootState} from "../containers";
 
 const MapStateToProps = (state: RootState) => ({

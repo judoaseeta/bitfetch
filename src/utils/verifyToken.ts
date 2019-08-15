@@ -2,7 +2,6 @@ import { decode, verify, JwtHeader } from 'jsonwebtoken';
 // @ts-ignore
 import * as jwkToPem from 'jwk-to-pem';
 import fetch from 'node-fetch';
-import {} from 'amazon-cognito-auth-js';
 type decodedToken = {
     header: JwtHeader;
     payload: any;
