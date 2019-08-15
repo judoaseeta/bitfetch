@@ -74,6 +74,7 @@ class Nav extends React.Component<Props, State> {
     componentDidUpdate(prevProps: Props) {
         const { pathname } = this.props.location;
         const { searching } = this.state;
+        // when user move a page via searchResult, turn off searchResult preview.
         if(pathname !== prevProps.location.pathname && searching) {
             this.setState({
                 searching: false,

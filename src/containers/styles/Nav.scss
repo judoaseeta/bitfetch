@@ -1,13 +1,15 @@
+@import '../../utils/utils';
+
 .container {
   display: flex;
   justify-content: space-between;
   background-color: #487eb0;
+  border-bottom: 1px solid lightgrey;
   width: 100%;
-  > nav {
+  & .navMenu {
     display: flex;
-    > ul {
+    & .navItems {
       display: flex;
-      flex-direction: row;
       -webkit-padding-start: 0;
       -webkit-margin-before: 0;
       -webkit-margin-after: 0;
@@ -15,11 +17,7 @@
     }
   }
   & .search {
-    display:flex;
-
-
-    justify-content: center;
-    align-items: center;
+    @extend %flexRowAligned;
     position: relative;
   }
   & .test {
