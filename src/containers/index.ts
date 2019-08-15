@@ -1,4 +1,4 @@
-import { applyMiddleware, combineReducers, compose, createStore  } from 'redux';
+    import { applyMiddleware, combineReducers, compose, createStore  } from 'redux';
 import { combineEpics, createEpicMiddleware } from 'redux-observable';
 import { epics as MainEpics, reducer as MainReducer } from './App';
 import { epics as CryptoEpics,  reducer as CryptoReducer } from './CryptoChart';
@@ -38,6 +38,13 @@ export const ClientSideStore = (preloadedState: any) => {
             applyMiddleware(EpicMiddleWare),
         )
     );
+    if (module.hot) {
+        // Enable Webpack hot module replacement for reducers
+        module.hot.accept('./rootReducer',() => {
+            const nextRootReducer = require('./rootReducer');
+            store.replaceReducer(nextRootReducer);
+        });
+    }
     EpicMiddleWare.run(rootEpics);
     return store;
 };
