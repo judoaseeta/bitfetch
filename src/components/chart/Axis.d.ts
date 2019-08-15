@@ -1,5 +1,5 @@
 import {ScaleBand, ScaleLinear} from "d3-scale";
-import { BlackBoxProps } from '../../utils/D3BlackBox';
+import { BlackBoxProps } from 'Utils/D3BlackBox';
 
 interface AxisBottomPropType extends BlackBoxProps {
     xScale: ScaleBand<Date>;

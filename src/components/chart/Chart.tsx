@@ -1,6 +1,5 @@
 import * as React from 'react';
 import {max, min} from 'd3-array';
-// helmet
 // chart children components.
 import AxisBottom from './AxisBottom';
 import AxisRight from './AxisRight';
@@ -8,10 +7,9 @@ import Band from './Band';
 import Candle from './Candle';
 import Circle from './Circle';
 import Current from './Current';
+import CurrentSymbol from './currentSymbol';
 import Disconnected from './Disconnected';
 import Gradient from './Gradient';
-import HistoTypes from './HistoTypes';
-// import Indicator from './Indicator';
 import Indicators from './Indicators';
 import Loading from './Loading';
 import Line from './Line';
@@ -106,30 +104,7 @@ const CandleChart = React.forwardRef<HTMLDivElement, RenderProps>(({
                     selectedIndex={selectedIndex}
                     timeParser={TimeParser(histo)}
                 />
-                <symbol
-                    className={symbolStyle('current', {
-                        up: flag === 1,
-                        down: flag === 2,
-                        same: flag === 4
-                    })}
-                    id="current"
-                    viewBox="0 0 50 25"
-                >
-                    <rect
-                        x={4}
-                        y={4}
-                        rx={5}
-                        ry={5}
-                        width={46}
-                        height={19}
-                    />
-                    <text
-                        x={10}
-                        y={14}
-                        fontSize="9px"
-                        fill="white"
-                    >{current}</text>.
-                </symbol>
+                <CurrentSymbol current={current} flag={flag}/>
                 <text
                     className={styles.fsym}
                     x={40}
@@ -221,18 +196,6 @@ const CandleChart = React.forwardRef<HTMLDivElement, RenderProps>(({
                         </>)
                     }
                 </g>
-                <Indicators
-                    bandwidth={bandwidth}
-                    data={data}
-                    height={height}
-                    maximum={maximum}
-                    selectedIndex={selectedIndex}
-                    type={type}
-                    volumeChartHeight={volumeChartHeight}
-                    volumeChartMarginTop={volumeChartMarginTop}
-                    xScale={xScale}
-                    yScale={yScale}
-                />
                 <AxisRight
                     x={width -  marginRight}
                     y={marginTop}
@@ -243,6 +206,7 @@ const CandleChart = React.forwardRef<HTMLDivElement, RenderProps>(({
                     transform={`translate(0, ${height - volumeChartHeight})`}
                 >
                     {data && data.map((dt, index) =>
+                        <>
                         <Volume
                             key={`${dt.volumeto}${dt.time}`}
                             selected={index === selectedIndex}
@@ -251,8 +215,27 @@ const CandleChart = React.forwardRef<HTMLDivElement, RenderProps>(({
                             width={bandwidth * 0.7}
                             height={volumeScale(0) - volumeScale(dt.volumefrom)}
                         />
+                            <circle
+                                cx={0}
+                                cy={volumeScale(dt.volumefrom)}
+                                r={5}
+                            />
+                        </>
                     )}
                 </g>
+                <Indicators
+                    bandwidth={bandwidth}
+                    data={data}
+                    height={height}
+                    maximum={maximum}
+                    selectedIndex={selectedIndex}
+                    type={type}
+                    volumeChartHeight={volumeChartHeight}
+                    volumeChartMarginTop={volumeChartMarginTop}
+                    volumeScale={volumeScale}
+                    xScale={xScale}
+                    yScale={yScale}
+                />
                 {IsTrue(histo === 'live' || histo === '3d', <AxisBottom
                     x={0}
                     xScale={xScale}

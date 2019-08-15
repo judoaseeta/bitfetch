@@ -4,7 +4,9 @@
   stroke-width: 0.1px;
   shape-rendering: crispEdges;
   opacity: 0;
+  will-change: opacity;
   &.selected{
+    transition: opacity 0.2s ease-out;
     opacity: 1;
   }
 }
