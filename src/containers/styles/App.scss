@@ -1,3 +1,4 @@
+
 *, *::before, *::after {
   box-sizing: border-box;
 }
@@ -11,4 +12,7 @@ body {
   width: 100vw;
   height: 100vh;
   grid-template-rows: 40px auto;
+  & .innerContainer {
+    // padding: 20px;
+  }
 }

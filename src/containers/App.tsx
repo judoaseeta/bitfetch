@@ -16,22 +16,22 @@ import * as styles from './styles/App.scss';
 // dumb components
 
 import Helmet from '../utils/HelmetCompo';
-import signedApi from '../utils/signedApi';
 import AuthForm from './AuthForm';
 import Confirm from './Confirm';
+import ExtendSearch from './ExtendSearch';
 import Header from './Nav';
 import TestCompo from './TestCompo';
 import { RootState } from './';
 
 import AccountCompo from '../components/account/Account';
-import TradeSystem from '../components/TradeSystem/';
-
+import TradeSystem from '../components/tradeSystem/';
+// import ExtendSearch from '../components/extendSearch/ExtendSearch';
 
 //utilities
 import {coinListUrl} from "../utils/api";
 import coinListMapper from "../utils/coinListMapper";
 import {signIn, signUp} from "../utils/Auth";
-import TriggeredRoute from '../utils/TriggeredRoute';
+import TriggeredRoute from "../utils/TriggeredRoute";
 
 /*
     Design App's code structure under DUCKS pattern.
@@ -44,8 +44,6 @@ import TriggeredRoute from '../utils/TriggeredRoute';
 export enum ActionTypes {
     REQUEST_COIN_LIST = 'REQUEST_COIN_LIST',
     COIN_LIST_TO_STATE = 'COIN_LIST_TO_STATE',
-    TEST_SSR = 'TEST_SSR',
-    NOTI = 'NOTI',
     AUTH_ERROR = 'AUTH_ERROR',
     SIGN_IN = 'SIGN_IN',
     SIGN_OUT = 'SIGN_OUT',
@@ -76,38 +74,34 @@ export const authActions = {
 export const dispatchers = {
     REQUEST_COIN_LIST: () => createAction(ActionTypes.REQUEST_COIN_LIST),
     COIN_LIST_TO_STATE: (payload: Map<string, any>) => createAction(ActionTypes.COIN_LIST_TO_STATE, payload),
-    TEST_SSR: (payload: string) => createAction(ActionTypes.TEST_SSR, payload),
-    NOTI: () => createAction(ActionTypes.NOTI),
     ...authActions
 };
 
 type Actions = ActionsUnion<typeof dispatchers>;
 
 // Epics.
-
+/*
+* The reason why place CoinListEpic here is it need to be fired when App is loaded first.
+*
+* */
 const CoinListEpic: Epic<Actions> = (action$: ActionsObservable<Actions>) => action$.pipe(
     ofType(ActionTypes.REQUEST_COIN_LIST),
-    mergeMap(action$ =>
+    mergeMap(() =>
         from(fetch(coinListUrl).then((res: any) => res.json())).pipe(
             map(data => coinListMapper(data)),
             map(data => new Map(Object.entries(data))),
-            tap(data => console.log(data)),
+            tap(d => console.log(d)),
             map(data => dispatchers.COIN_LIST_TO_STATE(data)),
         )
     )
 );
-const TestSsrEpic: Epic<Actions> = (action$: ActionsObservable<Actions>) => action$.pipe(
-    ofType<Actions, ActionWithPayload<ActionTypes.TEST_SSR, string>, ActionTypes.TEST_SSR>(ActionTypes.TEST_SSR),
-    tap((d) => console.log(d.payload)),
-    map(() => dispatchers.NOTI())
-);
 const SignInEpic: Epic<Actions> = (action$) => action$.pipe(
     ofType<Actions, ActionWithPayload<ActionTypes.SIGN_IN, AuthInfo>>(ActionTypes.SIGN_IN),
     mergeMap((d) =>from(signIn(d.payload)).pipe(
-        tap(d => console.log(d)),
+        tap(d=> console.log('console from', d)),
         map( d => {
             if(typeof d === 'string') return dispatchers.AUTH_ERROR(d);
-            return dispatchers.SIGN_IN_SUCCESS(d);
+            return dispatchers.SIGN_IN_SUCCESS(d!);
         }),
         catchError((e) => of(dispatchers.AUTH_ERROR(e.code))),
         )
@@ -117,15 +111,15 @@ const SignUpEpic: Epic<Actions> = (action$) => action$.pipe(
     ofType<Actions, ActionWithPayload<ActionTypes.SIGN_UP, SignUpInfo>>(ActionTypes.SIGN_UP),
     mergeMap((action$) =>from(signUp(action$.payload)).pipe(
         tap(d => console.log(d)),
-        map( d => dispatchers.SIGN_UP_SUCCESS()),
+        map( () => dispatchers.SIGN_UP_SUCCESS()),
         catchError((e) => of(dispatchers.AUTH_ERROR(e.code))),
         )
     )
 );
-export const epics = [ CoinListEpic, TestSsrEpic, SignInEpic,SignUpEpic ];
+export const epics = [ CoinListEpic, SignInEpic,SignUpEpic ];
 // Reducers.
 interface AppReducer {
-    coinList: null | Map<string, any>;
+    coinList: null | Map<string, CoinListData>;
     loaded: boolean;
     auth: {
         isSignIn: boolean;
@@ -197,27 +191,14 @@ map(keyword => this.state.coinKeys.filter(key => key.includes(keyword.toUpperCas
             map(filteredCoinKeys => filteredCoinKeys.map(key => this.state.coinList[key]))
 */
 
-export class App extends React.Component<App.Props, App.State> {
-    state = {
-        coinList: null,
-        loaded: false,
-    };
-    static getDerivedStateFromProps(props: App.Props,state: App.State) {
-        if(props.loaded && state.coinList !== props.coinList){
-            return {
-                coinList: props.coinList,
-                loaded: true
-            }
-        }
-        return null;
-    }
-    async componentDidMount() {
+export class App extends React.Component<Props, {}> {
+    componentDidMount() {
         if(!this.props.coinList) {
             this.props.REQUEST_COIN_LIST();
         }
     }
-    componentDidUpdate() {
-        console.log(this.props);
+    componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
+        console.log(error, errorInfo);
     }
 
     render() {
@@ -226,7 +207,7 @@ export class App extends React.Component<App.Props, App.State> {
                 className={styles.container}
             >
                 <Helmet
-                    title="Bitfetch: The best"
+                    title="Bitfetch: The best platform for CryptoCurrency"
                     metas={[
                         {
                             name: 'description',
@@ -238,11 +219,10 @@ export class App extends React.Component<App.Props, App.State> {
                         },
                     ]}
                 />
-                <Header
-                    coinList={this.state.coinList!}
-                    loaded={this.state.loaded}
-                />
-                <main>
+                <Header />
+                <main
+                    className={styles.innerContainer}
+                >
                     <Switch>
                         <Route
                             path="/"
@@ -260,6 +240,10 @@ export class App extends React.Component<App.Props, App.State> {
                         <Route
                             path="/currencies/:fsym"
                             component={TradeSystem}
+                        />
+                        <Route
+                            path="/search/:fsym"
+                            component={ExtendSearch}
                         />
                         <Route
                             path='/test'
@@ -287,14 +271,9 @@ export class App extends React.Component<App.Props, App.State> {
         )
     }
 }
-namespace App {
-    export type Props = ReturnType<typeof MapStateToProps>
-        & ReturnType<typeof MapDispatchToProps>
-        & RouteComponentProps;
-    export type State = {
-        coinList: Map<string, any> | null;
-        loaded: boolean
-    }
-}
+
+export type Props = ReturnType<typeof MapStateToProps>
+    & ReturnType<typeof MapDispatchToProps>
+    & RouteComponentProps;
 export default withRouter(connect(MapStateToProps, MapDispatchToProps)(App));
 
