@@ -1,11 +1,21 @@
 @import '../../utils/utils';
 .container {
  @extend %flexColumnAligned;
+  position: relative;
   height: 100%;
+  & .bgImage {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
   & .form {
     @extend %flexColumnAligned;
+    background-color: white;
     border: 1px solid black;
     padding: 2em;
+    z-index: 4;
     & .buttonHolder {
       display: flex;
     }

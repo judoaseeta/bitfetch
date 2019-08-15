@@ -11,6 +11,7 @@ import {RootState} from "./index";
 import { authActions } from './App';
 import Input from '../components/authForm/Input';
 import Label from '../components/authForm/AuthLabel';
+import LazyImage from '../utils/LazyImage';
 
 const mapStateToProps = (state: RootState) => ({ auth: state.main.auth});
 const mapDispatchToProps = (dispatch: Dispatch) => ({
@@ -90,13 +91,12 @@ class AuthForm extends React.Component<Props, State> {
         const { type } = this.props.match.params;
         const { email, password, name } = this.state;
         e.preventDefault();
-        console.log(email, password);
         if(type === 'signup') this.props.SIGN_UP({ username: email, name, password });
         else this.props.SIGN_IN({ username: email, password});
     };
     // common method for each authenticate situation.
     redirecter = (type: string) => {
-        const { goBack, replace } = this.props.history;
+        const { replace } = this.props.history;
         const { email } = this.state;
         console.log(type);
         if(type === 'UserNotConfirmedException') replace(`/confirm/${email}`);
@@ -106,7 +106,7 @@ class AuthForm extends React.Component<Props, State> {
             }
         }
         else if (type === 'signIn') {
-            replace('/');
+             replace('/');
         }
     };
     render() {
@@ -116,6 +116,11 @@ class AuthForm extends React.Component<Props, State> {
             <div
                 className={styles.container}
             >
+                <LazyImage
+                    className={styles.bgImage}
+                    previewSrc={'https://res.cloudinary.com/debzuxx1d/image/upload/w_50,c_scale/v1563119494/stock-1863880_1920_dmkkx6.jpg'}
+                    src={'https://res.cloudinary.com/debzuxx1d/image/upload/v1563119494/stock-1863880_1920_dmkkx6.jpg'}
+                />
                 <form
                     className={styles.form}
                     onSubmit={this.onSubmit}
