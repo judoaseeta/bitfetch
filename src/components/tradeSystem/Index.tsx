@@ -7,6 +7,7 @@ import Header from './Header';
 import AreaChart from '../../containers/AreaChart';
 import CryptoChart  from '../../containers/CryptoChart';
 import Chart from '../chart/Chart';
+import AreaChartCompo from '../areaChart/';
 import Tester from './Tester';
 import Helmet from '../../utils/HelmetCompo';
 const TradeSystem: React.FunctionComponent<{
@@ -15,21 +16,18 @@ const TradeSystem: React.FunctionComponent<{
     <div
         className={styles.container}
     >
-        <Header
-            fsym={fsym}
-        />
+        <Header />
         <Helmet
             title={`Virtual trading ${fsym} with Bitfetch`}
             metas={[
                 {
                     name: 'keywords',
-                    content:`${fsym}, virtual, trading, crypto-currency, crypto currencies,bitcoin, live candle chart, historic price`
+                    content:`${fsym}, virtual, trading, crypto-currency, crypto currencies, bitcoin, live candle chart, historical price`
                 }
             ]}
         />
         <main>
-
-            <div><AreaChart width={200} height={50}>{() => <div>12</div>}</AreaChart></div>
+            <AreaChart width={200} height={50}>{(props) => <AreaChartCompo {...props}/>}</AreaChart>
             <CryptoChart
                 width={700}
                 height={400}
