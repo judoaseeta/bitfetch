@@ -1,56 +1,57 @@
 import * as React from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEnvelope, faTimesCircle, faCheckCircle, faShieldAlt,faUserTag } from '@fortawesome/free-solid-svg-icons';
 import { bind } from 'classnames/bind';
 import { AuthInputType } from './Input';
+import FaIcon from '../../utils/faIcon';
 import * as styles from './styles/AuthIcon.scss';
 
 const cx = bind(styles);
-const AuthIcon: React.SFC<{
+const AuthIcon: React.FunctionComponent<{
     isError: boolean;
     isValidated: boolean;
     type: AuthInputType;
 }> = ({ isError, isValidated, type, }) => {
     if(isError) {
-        return <FontAwesomeIcon
-                    className={cx('authIcon', {
-                        error: isError,
-                        validated: isValidated,
-                    })}
-                    icon={['fas', 'times-circle']}
-                />
-    } else if (isValidated) {
-        return <FontAwesomeIcon
-                    className={cx('authIcon', {
-                        error: isError,
-                        validated: isValidated,
-                    })}
-                    icon={['fas', 'check-circle']}
-                />
-    }
-    if(type === AuthInputType.name) {
-        return <FontAwesomeIcon
-                    className={cx('name', {
-                        error: isError,
-                        validated: isValidated,
-                    })}
-                    icon={['fas', 'user-tag']} style={{  fontSize: '17px'}}
-                />
-    } else if (type === AuthInputType.password) {
-        return <FontAwesomeIcon
-                    className={cx('authIcon', {
-                        error: isError,
-                        validated: isValidated,
-                    })}
-                    icon={['fas', 'shield-alt']}
-                />
-    }
-    return <FontAwesomeIcon
+        return <FaIcon
                 className={cx('authIcon', {
                     error: isError,
                     validated: isValidated,
                 })}
-                icon={['fas', 'envelope']}
-        />
+                icon={faTimesCircle}
+               />
+    } else if (isValidated) {
+        return <FaIcon
+                className={cx('authIcon', {
+                    error: isError,
+                    validated: isValidated,
+                })}
+                icon={faCheckCircle}
+            />;
+    }
+    if(type === AuthInputType.name) {
+        return <FaIcon
+            className={cx('name', {
+                error: isError,
+                validated: isValidated,
+            })}
+            icon={faUserTag}
+        />;
+    } else if (type === AuthInputType.password) {
+        return <FaIcon
+            className={cx('authIcon', {
+                error: isError,
+                validated: isValidated,
+            })}
+            icon={faShieldAlt}
+        />;
+    }
+    return  <FaIcon
+        className={cx('authIcon', {
+            error: isError,
+            validated: isValidated,
+        })}
+        icon={faEnvelope}
+    />;
 };
 
 export default AuthIcon;
