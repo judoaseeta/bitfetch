@@ -1,0 +1,29 @@
+@import '../../../../utils/utils';
+
+.container {
+  @include CreateFlexLay(row, center, center);
+  padding: 0.3em;
+  width: 100%;
+  height: 100%;
+  position: relative;
+
+  & .drawCanvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    background-color: #BBBBFF;
+  }
+
+  & .hiddenCanvas {
+    position: absolute;
+    background: transparent;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 5;
+  }
+}

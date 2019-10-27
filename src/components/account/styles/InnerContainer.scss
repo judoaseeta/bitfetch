@@ -1,5 +1,6 @@
 .innerContainer {
   display: grid;
+  flex-grow: 3;
   grid-template-columns: 1fr 1fr 1fr;
   grid-template-areas:
   "a a l"

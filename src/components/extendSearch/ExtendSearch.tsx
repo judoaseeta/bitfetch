@@ -5,6 +5,8 @@ import { parse } from 'query-string';
 import { RootState } from '../../containers';
 import List from './ExtendSearchLIst';
 import PageIndicator from './PageIndicator';
+//entity
+import CoinListData from '../../core/lib/entities/coinListData';
 
 import * as styles  from './styles/ExtendSearch.scss';
 // constant for items length per page;

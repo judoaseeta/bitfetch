@@ -11,25 +11,29 @@ import CurrentSymbol from './currentSymbol';
 import Disconnected from './Disconnected';
 import Gradient from './Gradient';
 import Indicators from './Indicators';
-import Loading from './Loading';
+import Loading from '../../utils/puffLoader/Loading';
 import Line from './Line';
-import Menu from './Menu';
+import Menu from './Menu/Menu';
 import Stick from './Stick';
 import Symbols from './Symbols';
 import Volume from './Volume';
 
-import IsTrue from '../../utils/isTrue';
-import TimeParser from '../../utils/TimeParser';
+import { ConfigButton } from './Menu/Buttons';
+import IsTrue from '../../utils/component/isTrue';
+import TimeParser from '../../utils/data/TimeParser';
 import {ChartTypes, RenderProps} from '../../containers/CryptoChart';
 import {bind} from 'classnames/bind';
 import * as styles from './styles/CandleChart.scss';
 import * as symbolStyles from './styles/Symbols.scss';
 import * as axisStyles from './styles/Axis.scss';
 
+
 const candleStyle = bind(styles);
 const symbolStyle = bind(symbolStyles);
-const CandleChart = React.forwardRef<HTMLDivElement, RenderProps>(({
+const CandleChart: React.FC<RenderProps> = (({
                                           bandwidth,
+                                          chartBottomGap,
+                                          changeChartType,
                                           current,
                                           data,
                                           fsym,
@@ -39,12 +43,14 @@ const CandleChart = React.forwardRef<HTMLDivElement, RenderProps>(({
                                           line,
                                           isDisconnected,
                                           isMenuOn,
+                                          marginLeft,
                                           marginRight,
                                           marginTop,
                                           minimum,
                                           maximum,
                                           selectedIndex,
                                           setSelectedIndex,
+                                          setHisto,
                                           flag,
                                           histo,
                                           tsym,
@@ -56,25 +62,30 @@ const CandleChart = React.forwardRef<HTMLDivElement, RenderProps>(({
                                           volumeScale,
                                           xScale,
                                           yScale,
-                                      }, ref) => (
+                                      }) => (
         <div
             className={styles.container}
-            ref={ref}
         >
+            <Loading
+                strokeWidth={10}
+                isLoading={loading}
+            />
             <Disconnected
                 isActive={isDisconnected}
                 listenCurrent={listenCurrent}
             />
             <Menu
+                chartType={type}
+                changeChartType={changeChartType}
                 isMenuOn={isMenuOn}
+                histo={histo}
+                setHisto={setHisto}
                 toggleMenu={toggleMenu}
             />
-            <button
-                className={candleStyle('button', {
-                    active: !isMenuOn
-                })}
+            <ConfigButton
+                active={!isMenuOn}
                 onClick={toggleMenu}
-            >Menu</button>
+            />
             <svg
                 viewBox='0 0 700 400'
                 width='100%'
@@ -111,7 +122,7 @@ const CandleChart = React.forwardRef<HTMLDivElement, RenderProps>(({
                     y={marginTop / 2}
                     textAnchor='middle'
                 >
-                    {fsym} - {tsym}
+                    {fsym} - {type.toUpperCase()} - { histo }
                 </text>
                 <g
                     transform={`translate(0, ${marginTop})`}
@@ -120,27 +131,16 @@ const CandleChart = React.forwardRef<HTMLDivElement, RenderProps>(({
                         IsTrue(type === ChartTypes.candle, <>
                             {data && selectedIndex > -1 && <Band
                                 selected={selectedIndex > -1}
-                                x={xScale(data[selectedIndex].time)! + Math.floor(bandwidth / 4) + (bandwidth / 4) - 1}
+                                x={xScale(data[selectedIndex].date)! + Math.floor(bandwidth / 4) + (bandwidth / 4) - 1}
                                 height={height}
                             />
                             }
-                            {data && data.map((dt, index) => (<Candle
-                                key={`${dt.open}${index}`}
-                                open={dt.open}
-                                close={dt.close}
-                                x={xScale(dt.time)!}
-                                y={0}
-                                onMouseEnter={setSelectedIndex(index)}
-                                height={height}
-                                width={bandwidth}
-                                unvisible={true}
-                            />))}
                             {data && data.map((dt, index) => (<Stick
                                 key={`${dt.close}${index}`}
                                 open={dt.open}
                                 close={dt.close}
                                 selected={selectedIndex === index}
-                                x={xScale(dt.time)! + Math.floor(bandwidth / 4) + (bandwidth / 4) - 1}
+                                x={xScale(dt.date)! + Math.floor(bandwidth / 4) + (bandwidth / 4) - 1}
                                 y={yScale(dt.high)}
                                 height={yScale(dt.low) - yScale(dt.high)}
                             />))}
@@ -149,7 +149,7 @@ const CandleChart = React.forwardRef<HTMLDivElement, RenderProps>(({
                                 open={dt.open}
                                 close={dt.close}
                                 selected={index === selectedIndex}
-                                x={xScale(dt.time)! + Math.floor(bandwidth / 4)}
+                                x={xScale(dt.date)! + Math.floor(bandwidth / 4)}
                                 y={yScale(max([dt.open, dt.close])!)}
                                 height={yScale(min([dt.open, dt.close])!) - yScale(max([dt.open, dt.close])!)}
                                 width={bandwidth / 2}
@@ -164,86 +164,57 @@ const CandleChart = React.forwardRef<HTMLDivElement, RenderProps>(({
                                     d={line(data)!}
                                 />
                             }
-                            {data && data.map((dt, index) => (<Candle
-                                key={`${dt.open}${dt.time}`}
-                                open={dt.open}
-                                close={dt.close}
-                                x={xScale(dt.time)!}
-                                y={0}
-                                onMouseEnter={setSelectedIndex(index)}
-                                height={height}
-                                width={bandwidth}
-                                unvisible={true}
-                            />))}
                             {data && selectedIndex > -1 && <Band
                                 selected={selectedIndex > -1}
-                                x={xScale(data[selectedIndex].time)! + Math.floor(bandwidth / 4) + (bandwidth / 4) - 1}
+                                x={xScale(data[selectedIndex].date)! + Math.floor(bandwidth / 4) + (bandwidth / 4) - 1}
                                 height={height}
                             />
-                            }
-                            {
-                                data && data.map((dt, index) => (
-                                    <Circle
-                                        key={`${dt.time}${dt.close}`}
-                                        cx={xScale(dt.time)! + bandwidth / 2}
-                                        cy={yScale(dt.close)}
-                                        r={3}
-                                        selected={selectedIndex === index}
-                                        onMouseEnter={setSelectedIndex(index)}
-                                    />
-                                ))
                             }
                         </>)
                     }
                 </g>
+                <AxisBottom
+                    x={0}
+                    xScale={xScale}
+                    y={height - volumeChartHeight - volumeChartMarginTop}
+                    histo={histo}
+                />
                 <AxisRight
                     x={width -  marginRight}
                     y={marginTop}
                     yScale={yScale}
                     style={axisStyles.axis}
                 />
+
                 <g
-                    transform={`translate(0, ${height - volumeChartHeight})`}
+                    transform={`translate(0, ${height - volumeChartHeight - chartBottomGap})`}
                 >
                     {data && data.map((dt, index) =>
-                        <>
                         <Volume
-                            key={`${dt.volumeto}${dt.time}`}
+                            key={`${dt.volumeto}${dt.close}`}
                             selected={index === selectedIndex}
-                            x={xScale(dt.time)! + Math.floor(bandwidth * 0.15)}
+                            x={xScale(dt.date)! + Math.floor(bandwidth * 0.15)}
                             y={volumeScale(dt.volumefrom)}
                             width={bandwidth * 0.7}
                             height={volumeScale(0) - volumeScale(dt.volumefrom)}
                         />
-                            <circle
-                                cx={0}
-                                cy={volumeScale(dt.volumefrom)}
-                                r={5}
-                            />
-                        </>
                     )}
                 </g>
                 <Indicators
                     bandwidth={bandwidth}
                     data={data}
-                    height={height}
+                    translateY={height - volumeChartHeight - chartBottomGap}
                     maximum={maximum}
+                    marginTop={marginTop}
                     selectedIndex={selectedIndex}
                     type={type}
-                    volumeChartHeight={volumeChartHeight}
-                    volumeChartMarginTop={volumeChartMarginTop}
                     volumeScale={volumeScale}
                     xScale={xScale}
                     yScale={yScale}
                 />
-                {IsTrue(histo === 'live' || histo === '3d', <AxisBottom
-                    x={0}
-                    xScale={xScale}
-                    y={height - volumeChartHeight - volumeChartMarginTop}
-                    histo={histo}
-                />)}
+
                 // component for drawing line when histoType is neither 'live' nor '3d'
-                {IsTrue(histo !== 'live' && histo !== '3d' , <line
+                {IsTrue(histo !== 'LIVE' && histo !== '3DAY' , <line
                     stroke="white"
                     strokeWidth="1px"
                     x1={0}
@@ -255,13 +226,24 @@ const CandleChart = React.forwardRef<HTMLDivElement, RenderProps>(({
                 <Current
                     current={current}
                     x={width - marginRight}
-                    y={yScale(current) - 12.5 + marginTop}
+                    y={(yScale(current) - 12.5 + marginTop)}
                 />
-                // component for loading indicator
-                {IsTrue(loading, <Loading
-                    width={width}
-                    height={height}
-                />)}
+                //component for interact with mouse hovering
+                <g
+                    transform={`translate(0, ${marginTop})`}
+                >
+                    {data && data.map((dt, index) => (<Candle
+                        key={`${dt.open}${dt.high}`}
+                        open={dt.open}
+                        close={dt.close}
+                        x={xScale(dt.date)!}
+                        y={0}
+                        onMouseEnter={setSelectedIndex(index)}
+                        height={height}
+                        width={bandwidth}
+                        unvisible={true}
+                    />))}
+                </g>
             </svg>
         </div>
     )

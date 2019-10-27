@@ -1,0 +1,11 @@
+.button {
+  cursor: pointer;
+  color: white;
+  font-size: 30px;
+  position: absolute;
+  top: 5%;
+  right: 5%;
+  &:hover {
+    color: #ffeaa7;
+  }
+}

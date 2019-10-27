@@ -2,7 +2,7 @@ import * as React from 'react';
 import { faEnvelope, faTimesCircle, faCheckCircle, faShieldAlt,faUserTag } from '@fortawesome/free-solid-svg-icons';
 import { bind } from 'classnames/bind';
 import { AuthInputType } from './Input';
-import FaIcon from '../../utils/faIcon';
+import FaIcon from '../../utils/component/faIcon';
 import * as styles from './styles/AuthIcon.scss';
 
 const cx = bind(styles);

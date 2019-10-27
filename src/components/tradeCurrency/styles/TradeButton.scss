@@ -1,0 +1,15 @@
+@import '../../../utils/utils';
+
+
+.tradeButton {
+  background-color: #5352ed;
+  @include CreateFlexLay(row, center, center);
+  border: 1px solid white;
+  padding: 0.2em 0.4em;
+  cursor: pointer;
+  border-radius: 25px;
+  & .icon {
+    font-size: 25px;
+    margin-right: 0.1em;
+  }
+}

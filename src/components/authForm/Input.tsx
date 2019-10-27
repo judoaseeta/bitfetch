@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { withRouter, RouteComponentProps } from 'react-router-dom';
 import { bind } from 'classnames/bind';
 import * as styles from './styles/Input.scss';
 import AuthIcon from './AuthIcon';
@@ -16,7 +17,8 @@ const Input: React.SFC<{
     value: string;
     validated?: boolean;
     type?: string
-}> = ({ errorMessage, onChange, name, placeholder, value, type, validated, }) => (
+} & RouteComponentProps<{ authType: string}>> =
+    ({ errorMessage, onChange, name, placeholder, value, type, validated, match: { params: { authType}} }) => (
     <div
         className={cx('inputContainer', {
             error: !!errorMessage,
@@ -32,6 +34,7 @@ const Input: React.SFC<{
             type={name}
         />
         <input
+            autoComplete={authType === 'signin' ? type === "email" ? "username": "current-password": ""}
             className={cx('input', {
                 error: !!errorMessage,
                 validated: validated
@@ -50,4 +53,4 @@ const Input: React.SFC<{
     </div>
 );
 
-export default Input;
+export default withRouter(Input);

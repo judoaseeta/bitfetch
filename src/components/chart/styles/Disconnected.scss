@@ -1,4 +1,7 @@
 @import '../../../utils/utils';
+
 .container {
+  color: white;
+  background-color: rgba(0,0,0, 0.7);
   @extend %flexColumnAligned;
 }

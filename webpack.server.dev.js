@@ -33,8 +33,10 @@ module.exports = {
                             loader: require.resolve('css-loader/locals'),
                             options: {
                                 importLoaders: 2,
-                                modules: true,
-                                localIdentName: '[path][name]__[local]--[hash:base64:5]',
+                                modules: {
+                                    mode: 'local',
+                                    localIdentName: '[path][name]__[local]--[hash:base64:5]',
+                                },
                             },
                         },
                         {
@@ -77,7 +79,7 @@ module.exports = {
         externals: [nodeExternals()],
         devtool: 'cheap-module-source-map',
     resolve: {
-        extensions: ['.ts', '.tsx', '.js', '.jsx', '.jpg', '.png'],
+        extensions: ['.ts', '.tsx', '.js', '.jsx', '.jpg', '.png', '.scss'],
         alias: {
             Components: path.resolve(__dirname, 'src/components/'),
             Containers: path.resolve(__dirname, 'src/containers/'),

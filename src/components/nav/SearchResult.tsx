@@ -3,10 +3,11 @@ import SearchResultItem from './SearchResultItem';
 import ExtendSearchLink from './ExtendSearchLink';
 import * as styles from './styles/SearchResult.scss';
 import { bind } from 'classnames/bind';
-
+//entity
+import CoinListData from '../../core/lib/entities/coinListData';
 const cx = bind(styles);
 const SearchResult: React.FunctionComponent<{
-    filteredCoinList: CoinListItem[];
+    filteredCoinList: CoinListData[];
     filterKeyword: string;
     searching: boolean;
 }>= ({filteredCoinList, filterKeyword, searching, }) => (
@@ -18,9 +19,10 @@ const SearchResult: React.FunctionComponent<{
         {
             searching && filteredCoinList && filteredCoinList.slice(0, 10).map((item) =>
                 <SearchResultItem
-                    key={item.Id}
-                    CoinName={item.CoinName}
-                    Symbol={item.Symbol}
+                    key={item.id}
+                    coinName={item.coinName}
+                    filteredKeyword={filterKeyword}
+                    symbol={item.symbol}
                 />
             )
         }

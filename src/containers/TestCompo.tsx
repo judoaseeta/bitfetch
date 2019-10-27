@@ -1,5 +1,6 @@
 import * as React from 'react';
-import Api from "@aws-amplify/api";
+import signedApi from "../utils/apiUtils/signedApi";
+
 class TestCompo extends React.Component {
     state = {
 
@@ -12,10 +13,23 @@ class TestCompo extends React.Component {
         console.log('It has Updated: TEST')
     }
     load(){
-        console.log(Api.get('account', '/load',{}).catch(e => console.log(e.response.data)));
+            signedApi({
+                method: 'get',
+                endpointName: 'account',
+                path: '/load',
+            }).then( d => console.log(d));
     }
     render() {
-            return (<div onClick={this.load}>Test</div>);
+            return (
+              <div
+                style={{
+                    fontSize: '40px'
+                }}
+                onClick={this.load}
+              >
+                 hi
+              </div>
+    );
         }
 }
 export default TestCompo;

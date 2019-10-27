@@ -1,192 +1,37 @@
 import * as React from 'react';
 /// REDUX
 import { connect } from 'react-redux';
-import {Action , bindActionCreators, Dispatch, Reducer} from 'redux';
+import { bindActionCreators, Dispatch} from 'redux';
 
-// Rxjs
-import {catchError ,mergeMap, switchMap, map, takeUntil, tap, startWith} from 'rxjs/operators';
-import { from, of } from 'rxjs';
-import {ActionsObservable, Epic, ofType} from 'redux-observable';
 // REACT ROUTER
 import {RouteComponentProps, withRouter} from 'react-router-dom';
-import { parse } from 'query-string';
+
 
 // D3 dependencies.
 import {scaleLinear, scaleBand, ScaleBand, ScaleLinear } from 'd3-scale';
 import { min, max } from 'd3-array';
 import { line, Line  } from 'd3-shape';
 // rest of 3rd parties.
+import { parse } from 'query-string';
 /// local dependencies.
 
-import {createAction, ActionsUnion, ActionWithPayload} from '../utils/createAction';
-import { createCurrentSubcription, createSocketCoin, requestCurrencyData } from '../utils/api';
-import mappingCurrent from '../utils/mappingCurrent';
 import { RootState } from './';
-import { MappedHistoData, MappedHistoDataType, mappingResponse } from '../utils/histoDataMapper';
-import mapDataWithCurrent from '../utils/mapDatawithCurrent';
-// @ts-ignore
-import DecodeMessage from '../utils/decodeMessage.js';
+// domain
 
-export enum actionTypes {
-    CATCH_ERROR = 'CATCH_ERROR',
-    REQUEST_INITIAL_DATA = 'REQUEST_INITIAL_DATA',
-    REQUEST_SUCCESS =  'REQUEST_SUCCESS',
-    LISTEN_CURRENT =  'LISTEN_CURRENT',
-    SUBSCRIPTION_TO_STATE = 'SUBSCRIPTION_TO_STATE',
-    UNSUBSCRIBE = 'UNSUBSCRIBE',
-    CLEAR = 'CLEAR'
-};
-interface Input {
-    fsym: string;
-    tsym: string;
-}
-interface ApiRequestInput extends Input {
-    histo: string;
-}
-
-export const dispatchers = {
-    CATCH_ERROR: (e: Error) => createAction(actionTypes.CATCH_ERROR, e.message),
-    REQUEST_INITIAL_DATA: (req: ApiRequestInput) => createAction(actionTypes.REQUEST_INITIAL_DATA, req),
-    REQUEST_SUCCESS: (payload: MappedHistoData) => createAction(actionTypes.REQUEST_SUCCESS, payload),
-    LISTEN_CURRENT: (payload: Input) => createAction(actionTypes.LISTEN_CURRENT, payload),
-    SUBSCRIPTION_TO_STATE: (payload: any) => createAction(actionTypes.SUBSCRIPTION_TO_STATE, payload),
-    UNSUBSCRIBE: () => createAction(actionTypes.UNSUBSCRIBE),
-    CLEAR:() =>  createAction(actionTypes.CLEAR)
-};
-
-// type definitions for all actions.
-type Actions = ActionsUnion<typeof dispatchers>;
-
-//// Epic for listening current price via websocket.
-
-const SubscribeSingleCurrentEpic: Epic<Actions> = (action$: ActionsObservable<Actions>) => action$.pipe(
-    ofType<Actions, ActionWithPayload<actionTypes.LISTEN_CURRENT, Input>, actionTypes.LISTEN_CURRENT>(actionTypes.LISTEN_CURRENT),
-    switchMap(ac =>{
-        let { unsubscribe, observable} = createSocketCoin(createCurrentSubcription(ac.payload.fsym, ac.payload.tsym));
-        return observable.pipe(
-            map(sub => dispatchers.SUBSCRIPTION_TO_STATE(mappingCurrent(sub))),
-            takeUntil(action$.pipe(
-                ofType<Actions, Action<actionTypes.UNSUBSCRIBE>, actionTypes.UNSUBSCRIBE>(actionTypes.UNSUBSCRIBE),
-                tap(() => unsubscribe()),
-            )),
-            catchError(e => of(dispatchers.CATCH_ERROR(e))),
-        )
-    })
-);
-/*
-map((data: CoinHistoDataResp) => ({ ...data, Data: mappingDate(data.Data), time: d.payload.time})),
-            map(data => dispatchers.REQUEST_SUCCESS({ data, time: d.payload.tsym }))
-
- */
-
-const DataEpic: Epic<Actions> = (action$: ActionsObservable<Actions>, _)=> action$.pipe(
-    ofType<Actions, ActionWithPayload<actionTypes.REQUEST_INITIAL_DATA, ApiRequestInput>, actionTypes.REQUEST_INITIAL_DATA>(actionTypes.REQUEST_INITIAL_DATA),
-    mergeMap(action =>
-        from(requestCurrencyData(action.payload)).pipe(
-            map((data: any) => mappingResponse(data)),
-            map((data: MappedHistoData) => dispatchers.REQUEST_SUCCESS(data)),
-            startWith(dispatchers.LISTEN_CURRENT(action.payload)),
-            catchError(e => of(dispatchers.CATCH_ERROR(e))),
-        )
-    ),
-);
-
-export const epics = [ DataEpic, SubscribeSingleCurrentEpic ];
-
-// Reducer.
-
-
-
-
-interface ChartReducer {
-    chartData: {
-        data: MappedHistoDataType[],
-        currentPrice: {
-            current: number,
-            flag: number
-        },
-        listening: boolean,
-        isDisconnected: boolean,
-    }
-}
-const initialState = {
-    chartData: {
-        data: [],
-        currentPrice : {
-            current: 0,
-            flag: 0,
-        },
-        listening: false,
-        isDisconnected: false
-    }
-};
-export const reducer: Reducer<ChartReducer, Actions> = (state = initialState, action) => {
-    switch(action.type) {
-        case actionTypes.REQUEST_SUCCESS:
-            return {
-                ...state,
-                chartData : {
-                    ...state.chartData,
-                    data: action.payload.Data,
-                }
-            };
-        case actionTypes.SUBSCRIPTION_TO_STATE:
-            return {
-                ...state,
-                chartData: {
-                    ...state.chartData,
-                    data: state.chartData.data.length > 1? mapDataWithCurrent(state.chartData.data, action.payload.PRICE || state.chartData.currentPrice.current ) : state.chartData.data,
-                    currentPrice: {
-                        current: action.payload.PRICE ? action.payload.PRICE : state.chartData.currentPrice.current,
-                        flag: action.payload.FLAGS,
-                    },
-                    listening: true,
-                    isDisconnected: false
-                }
-            };
-        case actionTypes.CLEAR:
-            return {
-                ...state,
-                chartData: {
-                    ...state.chartData,
-                    data: [],
-                    currentPrice: {
-                        current: 0,
-                        flag: -1
-                    },
-                    listening: false
-                }
-            };
-        case actionTypes.CATCH_ERROR:
-            if(action.payload === 'disconnected') {
-                if(!state.chartData.listening) {
-                    console.log('yes!');
-                    return state;
-                }
-                return {
-                    ...state,
-                    chartData: {
-                        ...state.chartData,
-                        isDisconnected: true
-                    }
-                };
-            }
-            return state;
-        default: return state;
-    }
-};
+import { HistoData,HistoType } from '../core/lib/entities/histoData';
+import { externalDispatchers } from '../core/lib/adapters/redux/mainChartDataEpics';
 
 const mapStateToProps = (state: RootState) => {
     return {
-        data: state.chart.chartData.data,
-        isDisconnected: state.chart.chartData.isDisconnected,
-        ...state.chart.chartData.currentPrice,
+        data: state.chart.data,
+        isDisconnected: state.chart.isDisconnected,
+        ...state.chart.currentPrice,
     }
 };
 
 const mapDisPatchToProps = (dispatch: Dispatch) => ({
     ...bindActionCreators(({
-        ...dispatchers
+        ...externalDispatchers
     }), dispatch)
 });
 // D3 CHART RELATED STATIC VALUES.
@@ -197,13 +42,14 @@ export enum ChartTypes {
     candle = 'candle'
 }
 export type RenderProps = State & {
+    changeChartType: (chartType: ChartTypes) => () => void;
     current: number;
     setSelectedIndex: (num: number) => React.MouseEventHandler<SVGRectElement|SVGElement>;
-    setHisto: (histo: string) => React.MouseEventHandler<HTMLButtonElement>;
+    setHisto: (histo: string) => () => void;
     listenCurrent: React.MouseEventHandler<HTMLSpanElement>;
-    toggleMenu: React.MouseEventHandler<HTMLButtonElement>;
+    toggleMenu: React.MouseEventHandler<HTMLDivElement|HTMLButtonElement>;
     isDisconnected: boolean;
-    histo: string;
+    histo: HistoType;
     fsym: string;
     tsym: string;
 };
@@ -232,10 +78,11 @@ export type RenderProps = State & {
      */
     export interface State {
         bandwidth: number;
-        data: MappedHistoDataType[];
+        chartBottomGap: number;
+        data: HistoData[];
         flag: number;
         loading: boolean;
-        line: Line<MappedHistoDataType>;
+        line: Line<HistoData>;
         height: number;
         isMenuOn: boolean;
         selectedIndex: number;
@@ -260,17 +107,18 @@ class CryptoChart extends React.Component<Props, State> {
     };
     state: State = {
         bandwidth: 0,
+        chartBottomGap: 0,
         data: [],
         flag: -1,
         loading: true,
-        line: line<MappedHistoDataType>(),
+        line: line<HistoData>(),
         height: 0,
         isMenuOn: false,
         selectedIndex: -1,
         containerRef: React.createRef<HTMLDivElement>(),
         marginLeft: 0,
         marginTop: 33,
-        marginRight: 70,
+        marginRight: 20,
         maximum: 0,
         minimum: 0,
         type: ChartTypes.candle,
@@ -282,13 +130,15 @@ class CryptoChart extends React.Component<Props, State> {
         volumeScale: scaleLinear()
     };
     static getDerivedStateFromProps(nextProps: Props, prevState: State) {
-        let { marginRight, marginTop, line ,volumeScale,xScale, yScale} = prevState;
+        let { marginRight, marginTop, line ,volumeScale,xScale, yScale, width: prevWidth} = prevState;
         const { data, height, width, flag, isDisconnected } = nextProps;
-        if (prevState.width !== width || prevState.height !== height) {
+        if (prevWidth !== width || prevState.height !== height) {
             const volumeChartHeight = Math.floor(height / 6);
+            const chartBottomGap = Math.floor(volumeChartHeight / 10);
             const volumeChartMarginTop = Math.floor(height / 10);
-            const marginLeft = Math.floor(width * 0.03);
+            const marginLeft = Math.floor(width * 1) / 5000;
             return {
+                chartBottomGap,
                 width,
                 height,
                 marginLeft,
@@ -304,16 +154,16 @@ class CryptoChart extends React.Component<Props, State> {
 
             xScale
                 .range([prevState.marginLeft, width - marginRight])
-                .domain(data.map(dat => dat.time));
+                .domain(data.map(dat => dat.date));
             let bandwidth = xScale.bandwidth();
-            yScale.range([height - prevState.volumeChartHeight - marginTop - prevState.volumeChartMarginTop, 0])
+            yScale.range([height - prevState.volumeChartHeight - marginTop - prevState.volumeChartMarginTop - prevState.chartBottomGap, 0])
                 .domain([minimum!, maximum!])
                 .clamp(true)
                 .nice();
-            volumeScale.range([prevState.volumeChartHeight, 0])
-                .domain([min(data!, d => d.volumefrom)!, max(data, d => d.volumefrom)!])
+            volumeScale.range([prevState.volumeChartHeight - prevState.chartBottomGap, 0])
+                .domain([0, max(data, d => d.volumefrom)!])
                 .nice();
-            line.x((d) => xScale(d.time)! + bandwidth / 2)
+            line.x((d) => xScale(d.date)! + bandwidth / 2)
                 .y((d) => yScale(d.close));
             return {
                 bandwidth,
@@ -326,8 +176,6 @@ class CryptoChart extends React.Component<Props, State> {
                 volumeScale,
                 xScale,
                 yScale,
-                width,
-                height
             }
         } else if (data && flag !== prevState.flag) {
             if(flag === 4) {
@@ -343,7 +191,7 @@ class CryptoChart extends React.Component<Props, State> {
         if(!this.props.data.length) {
             this.props.REQUEST_INITIAL_DATA({
                 fsym: this.props.match.params.fsym,
-                histo: this.props.location.search ? parse(this.props.location.search).histo as string: 'live',
+                histo: this.props.location.search ? parse(this.props.location.search).histo as HistoType: HistoType.live,
                 tsym: this.props.location.search ? parse(this.props.location.search).tsym as string : 'USD',
             });
         }
@@ -352,31 +200,30 @@ class CryptoChart extends React.Component<Props, State> {
         const { fsym } = this.props.match.params;
         // when url path params 'fsym' is changed
         if(prevP.match.params.fsym !== fsym) {
-            this.renewCurrencyData();
+            this.renewCurrencyData(true);
         }
-        if(prevP.location.search !== this.props.location.search) {
-            this.props.UNSUBSCRIBE();
-            this.props.REQUEST_INITIAL_DATA({
-                fsym: fsym,
-                histo: parse(this.props.location.search).histo as string,
-                tsym: parse(this.props.location.search).tsym as string
-            });
+        if(parse(prevP.location.search ).histo!== parse(this.props.location.search).histo) {
+            this.renewCurrencyData();
         }
     }
     componentWillUnmount() {
-        console.log('unmounted');
-        this.props.UNSUBSCRIBE();
-        this.props.CLEAR();
+        this.props.RESET();
     };
+    changeChartType = (chartType: ChartTypes) => () => this.setState({ isMenuOn: false, type: chartType });
     shouldComponentUpdate(nextProps: Readonly<Props>, nextState: Readonly<State>, nextContext: any): boolean {
         const { fsym } = this.props.match.params;
-        const { current } = nextProps;
+        const { location} = this.props;
+        const { current, location: nextLocation } = nextProps;
         const { data, selectedIndex, isMenuOn } =  this.state;
-                return nextProps.match.params.fsym !== fsym || data !== nextState.data || current !== this.props.current || selectedIndex !== nextState.selectedIndex || isMenuOn !== nextState.isMenuOn;
+                return nextProps.match.params.fsym !== fsym
+                    || data !== nextState.data
+                    || current !== this.props.current
+                    || selectedIndex !== nextState.selectedIndex
+                    || isMenuOn !== nextState.isMenuOn
+                    || location !== nextLocation;
     }
 
     listenCurrent= () => {
-        console.log('donka')
         this.props.LISTEN_CURRENT({
             fsym: this.props.match.params.fsym,
             tsym: this.props.location.search ? parse(this.props.location.search).tsym as string : 'USD',
@@ -388,29 +235,36 @@ class CryptoChart extends React.Component<Props, State> {
         e.stopPropagation();
         this.setState({ selectedIndex: num });
     };
-    setHisto = (histo: string) => (e: React.MouseEvent<HTMLButtonElement>) => this.props.history.push(`/currencies/BTC?histo=${histo}`);
-    toggleMenu = (e: React.MouseEvent<HTMLButtonElement>) => this.setState({ isMenuOn: !this.state.isMenuOn});
-    renewCurrencyData() {
+    setHisto = (histo: string) => () => this.setState({isMenuOn: false},() => this.props.history.push(`/currencies/${this.props.match.params.fsym}?histo=${histo}`));
+    toggleMenu = (e: React.MouseEvent<HTMLDivElement>) => this.setState({ isMenuOn: !this.state.isMenuOn});
+    renewCurrencyData(isFullyRenew? : boolean) {
         this.setState({
             loading: true
         }, () => {
-            this.props.CLEAR();
-            this.props.UNSUBSCRIBE();
-            this.props.REQUEST_INITIAL_DATA({
-                fsym:this.props.match.params.fsym,
-                histo: parse(this.props.location.search).histo as string,
-                tsym: parse(this.props.location.search).tsym as string
-            });
+            if(isFullyRenew) {
+                this.props.RENEW({
+                    fsym: this.props.match.params.fsym,
+                    histo: this.props.location.search ? parse(this.props.location.search).histo as HistoType: HistoType.live,
+                    tsym: this.props.location.search ? parse(this.props.location.search).tsym as string : 'USD',
+                });
+            } else {
+                this.props.UPDATE_DATA({
+                    fsym: this.props.match.params.fsym,
+                    histo: this.props.location.search ? parse(this.props.location.search).histo as HistoType: HistoType.live,
+                    tsym: this.props.location.search ? parse(this.props.location.search).tsym as string : 'USD',
+                });
+            }
         })
     }
     render() {
         return this.props.children({
             ...this.state,
+            changeChartType: this.changeChartType,
             current: this.props.current,
             fsym: this.props.match.params.fsym,
             listenCurrent: this.listenCurrent,
             isDisconnected: this.props.isDisconnected,
-            histo: parse(this.props.location.search).histo as string,
+            histo: parse(this.props.location.search).histo as HistoType,
             setSelectedIndex: this.setSelectedIndex,
             setHisto: this.setHisto,
             toggleMenu: this.toggleMenu,

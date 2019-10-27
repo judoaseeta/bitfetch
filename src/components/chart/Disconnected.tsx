@@ -1,5 +1,5 @@
 import * as React from 'react'
-import Portal from '../../utils/Portal';
+import Portal from '../../utils/component/Portal';
 
 import * as styles from './styles/Disconnected.scss';
 

@@ -8,7 +8,7 @@ class Tester extends React.Component<{}> {
         console.log('i am updated too.')
     }
     render() {
-        return <div>hi</div>
+        return <div>s</div>
     }
 }
 

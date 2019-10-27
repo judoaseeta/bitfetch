@@ -21,7 +21,7 @@ const Symbols: React.SFC<{
             <text
                 x={19}
                 y={32.5}
-                fontSize="20px"
+                fontSize="18px"
                 fill="white"
             >
                 O:{selectedIndex > -1 && data[selectedIndex].open} C:{selectedIndex > -1 && data[selectedIndex].close}
@@ -41,7 +41,7 @@ const Symbols: React.SFC<{
             <text
                 x={5}
                 y={32.5}
-                fontSize="20px"
+                fontSize="18px"
                 fill="white"
             >
                 O:{selectedIndex > -1 && data[selectedIndex].open} C:{selectedIndex > -1 && data[selectedIndex].close}
@@ -75,7 +75,7 @@ const Symbols: React.SFC<{
                     textAnchor: 'end'
                 }}
             >
-                {selectedIndex > -1 && timeParser(data[selectedIndex].time)}
+                {selectedIndex > -1 && timeParser(data[selectedIndex].date)}
             </text>
         </symbol>
         <symbol
@@ -105,7 +105,7 @@ const Symbols: React.SFC<{
                     textAnchor: 'end'
                 }}
             >
-                {selectedIndex > -1 && timeParser(data[selectedIndex].time)}
+                {selectedIndex > -1 && timeParser(data[selectedIndex].date)}
             </text>
         </symbol>
     </>

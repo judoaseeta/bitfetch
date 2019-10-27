@@ -1,0 +1,16 @@
+@import '../../../utils/utils';
+
+.ticker {
+
+  @include CreateFlexLay(row, flex-start, flex-start);
+  width: 100%;
+  height: 100%;
+  font-size: 1rem;
+  &.up {
+    color: red;
+  }
+  &.down{
+    color: blue;
+  }
+
+}

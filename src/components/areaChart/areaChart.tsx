@@ -3,9 +3,10 @@ import { area, Area } from 'd3-shape';
 import { ScaleBand, ScaleLinear } from 'd3-scale';
 
 import { bind } from 'classnames/bind';
-import {MappedHistoDataType} from "../../utils/histoDataMapper";
-
+import { NavigateCurrency } from '../../containers/subCharts/SubCharts';
+import { HistoData  } from '../../core/lib/entities/histoData';
 import * as styles from './styles/areaChart.scss';
+
 const cx = bind(styles);
 const AreaChart: React.FunctionComponent<{
     coinName: string;
@@ -13,11 +14,12 @@ const AreaChart: React.FunctionComponent<{
     flag: number;
     width: number;
     height: number;
-    data: MappedHistoDataType[];
-    xScale: ScaleBand<Date>;
+    navigateTo: NavigateCurrency
+    data: HistoData[];
+    xScale: ScaleBand<number>;
     yScale: ScaleLinear<number, number>
-}> = ({ coinName, current, data, flag, width, height, xScale, yScale }) => {
-    const pathArea: Area<MappedHistoDataType> = area<MappedHistoDataType>()
+}> = ({ coinName, current, data, flag, width, height, navigateTo, xScale, yScale }) => {
+    const pathArea: Area<HistoData> = area<HistoData>()
                             .x(d => xScale(d.time)!)
                             .y0(yScale(0))
                             .y1(d => yScale(d.close));
@@ -34,6 +36,7 @@ const AreaChart: React.FunctionComponent<{
                 className={styles.coinName}
                 x={5}
                 y={5}
+                onClick={navigateTo(coinName)}
             >{coinName}
             </text>
         {
@@ -46,7 +49,7 @@ const AreaChart: React.FunctionComponent<{
                     })}
                     x={width * 2.5 /4}
                     y={5}
-                >{current}
+                >{flag === 1 ? '▲' : flag === 2 ? '▼' : ''}{current}
                 </text>
                 :<text
                     className={styles.price}

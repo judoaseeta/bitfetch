@@ -1,16 +1,62 @@
+@import '../../../utils/utils';
+
 .authButton {
-  display: flex;
-  flex-flow: row nowrap;
-  justify-content: center;
-  align-items: center;
-  padding-left: 20px;
-  padding-right: 20px;
+  @include CreateFlexLay(row, center, center);
+  background-color: inherit;
   font-size: 14px;
   color: white;
   font-weight: bold;
-  & .userName:hover {
-    cursor: pointer;
-    text-decoration: underline;
+  &.signed {
+    &:hover {
+      background-color: #706fd3;
+      & .accountNav {
+        visibility: visible;
+      }
+    }
+    & .accountNav {
+      color: black;
+      position: absolute;
+      left: 0;
+      border: 1px solid black;
+      border-top: none;
+      background-color: #95afc0;
+      @include CreateFlexLay(column);
+      height: auto;
+      visibility: hidden;
+      transition: opacity 0.2s ease-in;
+      position: absolute;
+      top: 100%;
+      width: 100%;
+      list-style: none;
+      -webkit-margin-before: 0;
+      -webkit-margin-after: 0;
+      -webkit-margin-start: 0px;
+      -webkit-margin-end: 0px;
+      -webkit-padding-start: 0;
+    }
+
+
+    & .userName {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      padding-left: 1em;
+      padding-right: 1em;
+      & .namePart{
+        @include CreateFlexLay(column, center, center);
+        width: 100%;
+        height: 100%;
+        &:hover {
+          cursor: pointer;
+          text-decoration: underline;
+        }
+      }
+
+    }
+  }
+
+  & a {
+    display: flex;
   }
   & a:visited {
     color: white;
@@ -25,10 +71,4 @@
   & .hoverBar {
     display: none;
   }
-  &.signed {
-    & .hoverBar {
-      display: flex;
-    }
-  }
-
 }

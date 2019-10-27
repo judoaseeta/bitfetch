@@ -1,0 +1,47 @@
+$timing: 200ms;
+
+.enter {
+  z-index: 10;
+  transform: translateX(30px);
+  transition-duration:$timing;
+  transition: opacity;
+  transition-timing-function: ease;
+  width: 100%;
+}
+.enterActive {
+  z-index: 10;
+  transform: translateX(0);
+  // opacity: 1;
+  position: fixed;
+  width: 100%;
+}
+.enterDone {
+  transform: translateX(0);
+}
+.exit {
+  z-index:9;
+  transform: translateX(30px);
+  transition-duration:$timing;
+  transition-timing-function: ease;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  opacity: 0.9;
+  transition: opacity;
+  // animation-name: slide-out;
+  // animation-duration: 200ms;
+  // animation-timing-function: ease-out;
+}
+.exitActive {
+  z-index:9;
+  opacity: 0.5;
+  position: fixed;
+  transform: translateX(-30px);
+  // opacity:0;
+}
+.exitDone {
+  transform: translateX(-100%);
+  opacity: 0.2;
+}

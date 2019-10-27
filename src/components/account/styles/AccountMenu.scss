@@ -1,0 +1,10 @@
+.accountMenu {
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
+  & .item {
+      &.active {
+        color: blue;
+      }
+  }
+}

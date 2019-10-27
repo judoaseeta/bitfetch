@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import Item from './PageIndicatorItem';
 import PageArrow from './PageArrow';
-import DecimalAdjust from '../../utils/decimalAdjust';
+import DecimalAdjust from '../../utils/data/decimalAdjust';
 import * as styles from './styles/PageIndicator.scss';
 const iterateList = (list: JSX.Element[], start:number,range: number, currentPage: number) => {
     if( start === range) start = range - 10;

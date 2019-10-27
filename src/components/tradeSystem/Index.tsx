@@ -4,19 +4,23 @@ import { RouteComponentProps, withRouter } from 'react-router-dom';
 import * as styles from './index.scss';
 
 import Header from './Header';
-import AreaChart from '../../containers/AreaChart';
+import Analysis from '../../containers/Analysis';
+import AreaChart from '../../containers/subCharts/SubCharts';
 import CryptoChart  from '../../containers/CryptoChart';
+import InvestStatus from '../../containers/InvestStatus';
+import TradingPairs from '../../containers/TradingPairs';
 import Chart from '../chart/Chart';
 import AreaChartCompo from '../areaChart/';
+import AnalCompo from '../analysis/';
+import TradeStatusCompo from '../tradeStatus';
 import Tester from './Tester';
-import Helmet from '../../utils/HelmetCompo';
+import Helmet from '../../utils/component/HelmetCompo';
 const TradeSystem: React.FunctionComponent<{
 
 } & RouteComponentProps<{ fsym: string }>> = ({ match: { params: { fsym } } }) => (
     <div
         className={styles.container}
     >
-        <Header />
         <Helmet
             title={`Virtual trading ${fsym} with Bitfetch`}
             metas={[
@@ -26,19 +30,25 @@ const TradeSystem: React.FunctionComponent<{
                 }
             ]}
         />
+        <Header />
         <main>
             <AreaChart width={200} height={50}>{(props) => <AreaChartCompo {...props}/>}</AreaChart>
             <CryptoChart
                 width={700}
                 height={400}
             >
-                {(props) => (<Chart
-                        {...props}
-                />)
-                }
+                {(props) => (<Chart {...props} />)}
             </CryptoChart>
         </main>
-        <Tester />
+        <div
+            className={styles.status}
+        >
+            <InvestStatus>{props => <TradeStatusCompo {...props} />}</InvestStatus>
+            <TradingPairs />
+        </div>
+        <footer>
+            <Analysis>{rProps => <AnalCompo {...rProps} /> }</Analysis>
+        </footer>
     </div>
 );
 

@@ -1,6 +1,10 @@
 .coinName {
   font-size: 14px;
-  user-select: none;
+  font-weight: bold;
+  &:hover {
+    cursor:pointer;
+    text-decoration: underline;
+  }
 }
 .price {
   font-size: 12px;
@@ -23,7 +27,7 @@
 .area {
   stroke: none;
   stroke-width: 1px;
-  fill: greenyellow;
+  fill: #f368e0;
   fill-opacity: 0.7;
 }
 .current {

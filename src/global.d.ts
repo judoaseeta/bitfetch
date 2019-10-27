@@ -41,6 +41,17 @@ interface CoinHistoDataResp {
     TimeFrom: number;
     FirstValueInArray: boolean;
 }
+interface Rep {
+    Data: CoinHistoDataResp
+    TimeFrom: number;
+    TimeTo: number;
+    __proto__: Object;
+    HasWarning: boolean;
+    Message: string;
+    RateLimit: any;
+    Response: string;
+    Type: number
+}
 interface CoinHistoData {
     time: number;
     close: number;
@@ -50,90 +61,34 @@ interface CoinHistoData {
     volumefrom: number;
     volumeto: number;
 }
-interface CoinListResp {
-    Response: string;
-    Message: string;
-    Data: {
-        [k: string] : CoinListData;
-    }
-}
-interface TopListResp {
-    Message: string;
-    Type: number;
-    SponseredData: any[];
-    Data: TopListData[];
-}
-interface TopListData {
-    CoinInfo: {
-        Id: string;
-        Name: string;
-        FullName: string;
-        Internal: string;
-        ImageUrl: string;
-        Url: string;
-        Algorithm: string;
-        ProofTYpe: string;
-        NetHashesPerSecond: number;
-        BlockNumber: number;
-        BlockTime: number;
-        BlockReward: number;
-        Type: number;
-        DocumentType: string;
-    }
-    ConversionInfo: {
-        Conversion: string;
-        ConversionSymbol: string;
-        CurrencyFrom: string;
-        CurrencyTo: string;
-        Market: string;
-        Supply: number;
-        TotalVolume24H: number;
-        SubBase: string;
-        SubsNeeded: string[];
-        RAW: string;
-    }
-}
-interface CoinListData {
-    Id: string;
-    Url: string;
-    ImageUrl: string;
-    Name: string;
-    Symbol: string;
-    CoinName: string;
-    FullName: string;
-    Algorithm: string;
-    ProofType: string;
-    FullyPremined: string;
-    TotalCoinSupply: string;
-    BuiltOn: string;
-    SmartContractAddress: string;
-    PreMinedValue: string;
-    TotalCoinsFreeFloat: string;
-    SortOrder: string;
-    Sponsored: boolean;
-    IsTrading: boolean;
-}
-interface MultiCoinResp {
-    name: string;
-    resp: CoinHistoDataResp;
-}
+
 declare enum AuthInputType {
     email = 'email',
     password = 'password',
     name = 'name',
 }
-interface DecodedCurrencyLiveData {
-    FLAGS: number
-    FROMSYMBOL:string
-    LASTTRADEID: number
-    LASTUPDATE: number
-    LASTVOLUMETO: number
-    MARKET: string
-    TOSYMBOL: string
-    TYPE: string
-    VOLUME24HOUR: number
-    VOLUME24HOURTO: number
-    VOLUMEHOUR: number
-    VOLUMEHOURTO: number
-    PRICE?: number
+
+type TradingPairData = {
+    exchange: string;
+    fromSymbol: string;
+    toSymbol: string;
+    volume24h: number;
+    volume24hTo: number;
+}
+
+declare enum CoinTradeType {
+    BUY = "2",
+    SELL = "1"
+}
+interface CoinTradeDecodedData {
+    F: CoinTradeType;
+    FSYM: string; // fsym
+    ID: string;
+    M: string; //exchange
+    P: string;// price
+    Q: string; // quantity
+    T: string;
+    TOTAL: string;// total
+    TS: string;
+    TSYM: string; // targetsym
 }

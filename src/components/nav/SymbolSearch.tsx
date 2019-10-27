@@ -2,10 +2,11 @@ import * as React from 'react';
 import * as styles from './styles/SymbolSearch.scss';
 import SearchInput from './SearchInput';
 import SearchResult from './SearchResult';
-
+// entity
+import CoinListData from '../../core/lib/entities/coinListData';
 
 const SymbolSearch: React.FunctionComponent<{
-    filteredCoinList: CoinListItem[];
+    filteredCoinList: CoinListData[];
     filterKeyword: string;
     loaded: boolean;
     searching: boolean;

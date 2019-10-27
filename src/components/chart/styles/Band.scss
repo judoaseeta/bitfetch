@@ -6,7 +6,6 @@
   opacity: 0;
   will-change: opacity;
   &.selected{
-    transition: opacity 0.2s ease-out;
     opacity: 1;
   }
 }

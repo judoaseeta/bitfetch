@@ -1,0 +1,15 @@
+@import '../utils';
+.loader {
+  @include CreateFlexLay(row, center, center);
+  width: 100%;
+  height: 100%;
+  background-color: #130f40;
+
+  & .puff {
+    stroke: #f6e58d;
+    width: 20em;
+    height: 20em;
+  }
+
+}
+

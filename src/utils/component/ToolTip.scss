@@ -1,0 +1,93 @@
+@mixin commonArrow {
+  content: " ";
+  position: absolute;
+  margin-left: -5px;
+  border-width: 0.8em;
+  border-style: solid;
+  visibility: hidden;
+}
+
+@mixin fromLeft {
+  right: 125%;
+}
+
+@mixin fromRight {
+  left: 120%;
+}
+@mixin fromTop {
+  bottom: 120%;
+}
+@mixin fromDown {
+  top: 120%;
+}
+
+.tooltipBody {
+  position:relative;
+  &.fromUp {
+    &::after {
+      @include commonArrow;
+      border-color: black transparent transparent transparent;
+      top: -20%;
+      margin-bottom: 0.4em;
+      left: 0;
+      margin-left: 0.4em;
+    }
+  }
+  &.fromDown {
+    &::after {
+      @include commonArrow;
+      border-color: transparent transparent black transparent;
+      bottom: -20%;
+      margin-top: 0.4em;
+      left: 0;
+      margin-left: 0.4em;
+    }
+  }
+  &.fromLeft {
+    &::after {
+      @include commonArrow;
+      border-color: transparent transparent transparent black;
+      top: 0;
+      margin-top: 0.4em;
+      left: -20%;
+      margin-right: 0.4em;
+    }
+  }
+  &.fromRight {
+    &::after {
+      @include commonArrow;
+      border-color: transparent black transparent transparent;
+      top: 0;
+      margin-top: 0.4em;
+      right: -20%;
+      margin-left: 0.4em;
+    }
+  }
+  &:hover {
+    &::after {
+      visibility: visible;
+    }
+    & .toolTipContent {
+      visibility: visible;
+    }
+  }
+
+  & .toolTipContent {
+    visibility: hidden;
+    position: absolute;
+    z-index: 55;
+    &.fromUp {
+      @include fromTop;
+    }
+    &.fromDown {
+      @include fromDown;
+    }
+    &.fromLeft {
+      @include fromLeft;
+    }
+    &.fromRight {
+      @include fromRight;
+    }
+
+  }
+}

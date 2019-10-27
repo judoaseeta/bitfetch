@@ -1,23 +1,28 @@
 import * as React from 'react';
 import { Link, withRouter, RouteComponentProps } from 'react-router-dom';
 
+import HighLightedString from '../../utils/component/highlightedSpan';
 import * as styles from './styles/SearchResultItem.scss';
 const SearchResultItem: React.FunctionComponent<{
-    CoinName: string;
-    Symbol: string;
-} & RouteComponentProps> = ({CoinName, Symbol, }) => (
-    <li
+    filteredKeyword: string;
+    coinName: string;
+    symbol: string;
+} & RouteComponentProps> = ({coinName, filteredKeyword, symbol, }) => {
+    return <li
         className={styles.container}
-        id={Symbol}
+        id={symbol}
     >
-            <Link
-                className={styles.link}
-                to={{
-                    pathname: `/currencies/${Symbol}`,
-                    search: '?histo=live'
-                }}
-            >{CoinName}:{Symbol}</Link>
+        <Link
+            className={styles.link}
+            to={{
+                pathname: `/currencies/${symbol}`,
+                search: '?histo=LIVE'
+            }}
+        >
+        <HighLightedString highlightedString={filteredKeyword} targetString={coinName} highlightClassName={styles.highlighted} />
+        :<HighLightedString highlightedString={filteredKeyword} targetString={symbol} highlightClassName={styles.highlighted} />
+        </Link>
     </li>
-);
+};
 
 export default withRouter(SearchResultItem);

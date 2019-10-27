@@ -16,6 +16,7 @@ const config: Configuration = {
     },
     plugins: [
         new Webpack.HotModuleReplacementPlugin(),
+
     ],
     module: {
         rules: [
@@ -33,14 +34,19 @@ const config: Configuration = {
             {
                 test: /\.scss$/,
                 use: [
-                    'style-loader',
+                    {
+                        loader: 'style-loader',
+
+                    },
                     {
                         loader: require.resolve('css-loader'),
                         options: {
                             importLoaders: 1,
-                            modules: true,
-                            localIdentName: '[path][name]__[local]--[hash:base64:5]',
-                            sourceMap: true
+                            modules: {
+                                mode: 'local',
+                                localIdentName: '[path][name]__[local]--[hash:base64:5]',
+                            },
+                            sourceMap: true,
                         },
                     },
                     {
@@ -66,7 +72,6 @@ const config: Configuration = {
                     {
                         loader: require.resolve('sass-loader'),
                         options: {
-                            // 나중에 입력
                         }
                     }
                 ],
@@ -80,11 +85,12 @@ const config: Configuration = {
         ]
     },
     resolve: {
-        extensions: ['.ts', '.tsx', '.js', '.jsx', '.jpg', '.png'],
+        extensions: ['.ts', '.tsx', '.js', '.jsx', '.jpg', '.png', '.scss'],
         alias: {
             Components: path.resolve(__dirname, 'src/components/'),
             Containers: path.resolve(__dirname, 'src/containers/'),
-            Utils: path.resolve(__dirname, 'src/utils/')
+            Utils: path.resolve(__dirname, 'src/utils/'),
+            Fonts: path.resolve(__dirname, 'src/fonts/')
         }
     },
     devtool: 'inline-cheap-module-source-map',

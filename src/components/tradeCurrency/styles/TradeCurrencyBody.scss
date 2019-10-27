@@ -1,0 +1,18 @@
+@import '../../../utils/utils';
+.container {
+  background-color: rgba(#57606f, 0.7);
+  width: 100%;
+  height: 100%;
+  position: relative;
+  @include CreateFlexLay(row, center, center);
+  &.assets {
+
+  }
+  & .innerContainer {
+    @include CreateFlexLay(row, center, center);
+    width: 32em;
+    height: 20em;
+    background-color: red;
+    border: 1px solid whitesmoke;
+  }
+}

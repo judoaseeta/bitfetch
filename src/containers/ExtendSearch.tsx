@@ -6,9 +6,13 @@ import {from, Subject} from "rxjs";
 import {debounceTime, distinctUntilChanged, filter, map, reduce, switchMap, tap} from 'rxjs/operators';
 
 import ExtendSearchCompo from '../components/extendSearch/ExtendSearch';
+
+//entity
+import CoinListData from '../core/lib/entities/coinListData';
+
 const MapStateToProps = (state: RootState) => ({
-    coinList: state.main.coinList,
-    isLoaded: state.main.loaded
+    coinList: state.coinList.coinList,
+    isLoaded: state.coinList.loaded
 });
 type Props = RouteComponentProps<{
     fsym: string

@@ -2,14 +2,18 @@ import * as React from 'react';
 import {Subject, from } from 'rxjs';
 import { distinctUntilChanged, debounceTime, filter, switchMap, tap, reduce } from 'rxjs/operators';
 import {RouteComponentProps, withRouter} from 'react-router-dom';
-import { connect } from 'react-redux';
+import {connect, MapDispatchToProps} from 'react-redux';
 
 import NavItem from '../components/nav/NavItem';
 import SymbolSearch from '../components/nav/SymbolSearch';
 import AuthButton from '../components/nav/AuthButton';
 import * as styles from './styles/Nav.scss';
 import {RootState} from "./index";
-
+import {bindActionCreators, Dispatch} from "redux";
+// entity
+import CoinListData from '../core/lib/entities/coinListData';
+// adapter
+import { externalDispathcers } from '../core/lib/adapters/redux/coinListEpic'
 
 const NavItems = [
     {
@@ -19,12 +23,16 @@ const NavItems = [
     {
         name: 'Market',
         to: '/market'
+    },
+    {
+        name: 'Analysis',
+        to: '/anal'
     }
 ];
 
 
 // Reducers.
-export type Props = ReturnType<typeof MapStateToProps> & RouteComponentProps;
+export type Props = ReturnType<typeof MapStateToProps> &  ReturnType<typeof MapDispatchToProps> & RouteComponentProps;
 export interface State {
     eventSubject: Subject<string>;
     filterKeyword: string;
@@ -33,8 +41,12 @@ export interface State {
     isUserMenuOn:boolean;
 }
 const MapStateToProps = (state: RootState) => ({
-    coinList: state.main.coinList,
-    loaded: state.main.loaded,
+    ...state.coinList
+});
+const MapDispatchToProps = (dispatch: Dispatch) => ({
+    ...bindActionCreators({
+        ...externalDispathcers
+    }, dispatch)
 });
 class Nav extends React.Component<Props, State> {
     state = {
@@ -45,6 +57,9 @@ class Nav extends React.Component<Props, State> {
         searching: false,
     };
     componentDidMount(): void {
+        if(!this.props.coinList) {
+            this.props.REQUEST_COIN_LIST();
+        }
         this.state.eventSubject.pipe(
             tap(d => this.setState({ filterKeyword: d})),
             debounceTime(400),
@@ -57,8 +72,10 @@ class Nav extends React.Component<Props, State> {
                     return [];
                 }
                 let regex = new RegExp(replacedString, 'i');
-                return from(this.props.coinList!).pipe(
-                    filter(item => regex.test(item[0])),
+                return from<Map<string, CoinListData>>(this.props.coinList!).pipe(
+                    filter(item => {
+                        return regex.test(item[0]) || regex.test(item[1].coinName);
+                    }),
                     reduce((acc,curr)=> {
                         if(curr[0] === upperCasedKeyword) {
                             return [curr[1], ...acc];
@@ -94,13 +111,13 @@ class Nav extends React.Component<Props, State> {
     setFilterKeyword = (e: React.ChangeEvent<HTMLInputElement>) => {
         e.persist();
         if(this.props.coinList) {
-            this.state.eventSubject.next(e.target.value);
+            this.state.eventSubject.next(e.target.value.trim());
         }
     };
     setSearching = (e: React.FocusEvent<HTMLInputElement>) => {
 
         console.log(e.relatedTarget, e.type);
-        // if event type is blur then searching will be set to false, searching modal will be disappeared.
+        // if event type is blur then searching will be set to false, searching modal will disappear.
         if(e.type === 'blur') {
             // check whether relatedTarget is for preventing false is assigned to 'searching'
             // to navigate where the user wants to go
@@ -145,4 +162,4 @@ class Nav extends React.Component<Props, State> {
     }
 }
 
-export default withRouter(connect(MapStateToProps)(Nav));
+export default withRouter(connect(MapStateToProps,MapDispatchToProps)(Nav));
