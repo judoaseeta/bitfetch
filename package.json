@@ -104,7 +104,7 @@
     "@loadable/server": "^5.10.2",
     "ably": "^1.0.23",
     "amazon-cognito-identity-js": "^3.0.15",
-    "aws-sdk": "^2.441.0",
+    "aws-sdk": "^2.814.0",
     "bezier-easing": "^2.1.0",
     "classnames": "^2.2.6",
     "cookie-parser": "^1.4.3",
