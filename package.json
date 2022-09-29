@@ -112,7 +112,7 @@
     "crypto-js": "^3.1.9-1",
     "d3-array": "^1.2.1",
     "d3-axis": "^1.0.8",
-    "d3-color": "^1.4.0",
+    "d3-color": "^3.1.0",
     "d3-line": "0.0.1",
     "d3-scale": "^2.1.0",
     "d3-scale-chromatic": "^1.5.0",
